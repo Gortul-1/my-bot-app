@@ -2,10 +2,15 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Запрещаем зум и сдвиги экрана -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Поисковики</title>
+    <!-- Правильная ссылка на скрипт Telegram -->
     <script src="https://telegram.org"></script>
     <style>
+        * {
+            box-sizing: border-box; /* Чтобы кнопки не вылезали за края */
+        }
         body {
             font-family: sans-serif;
             background-color: var(--tg-theme-bg-color, #ffffff);
@@ -16,6 +21,7 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            overflow: hidden; /* Отключаем прокрутку вовсе */
         }
         .container { text-align: center; width: 90%; }
         h2 { margin-bottom: 20px; }
@@ -25,7 +31,7 @@
             padding: 15px;
             margin: 10px 0;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
@@ -46,6 +52,7 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); // Развернуть на всё окно
+        tg.ready();  // Сообщить Telegram, что приложение готово
     </script>
 </body>
 </html>
