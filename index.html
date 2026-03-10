@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мое Мини-Приложение</title>
+    <!-- Подключаем скрипт Телеграма -->
+    <script src="https://telegram.org"></script>
+    <style>
+        body {
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #222222);
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background: #248b91;
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #ffffff;
+            color: #248b91;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Привет, это Приложение! 🚀</h1>
+        <p>Ты открыл его прямо в Telegram.</p>
+        <button onclick="tg.close()">Закрыть окно</button>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp; // Получаем доступ к API Телеграма
+        tg.expand(); // Разворачиваем окно на весь экран
+    </script>
+</body>
+</html>
