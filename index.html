@@ -4,29 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mini App</title>
-    <!-- Подключаем скрипт Telegram -->
+    <!-- Правильная ссылка на скрипт Telegram -->
     <script src="https://telegram.org"></script>
-    <!-- Подключаем Tailwind CSS для работы классов из твоего плагина -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        /* Привязываем цвета к теме Telegram */
         :root {
             --bg-color: var(--tg-theme-bg-color, #ffffff);
-            --text-color: var(--tg-theme-text-color, #000000);
-            --button-bg: var(--tg-theme-button-color, #2481cc);
-            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            /* Твой цвет кнопок C8C8C8 */
+            --button-bg: #C8C8C8; 
+            --button-text: #000000;
         }
 
         body {
             background-color: var(--bg-color);
-            color: var(--text-color);
             margin: 0;
             padding: 0;
             font-family: sans-serif;
         }
 
-        /* Стили для твоих кнопок из дизайна */
         .custom-button {
             display: flex;
             align-items: center;
@@ -36,16 +32,17 @@
             color: var(--button-text);
             font-weight: bold;
             text-transform: uppercase;
-            transition: transform 0.1s ease;
+            transition: transform 0.1s ease, opacity 0.2s;
             border: none;
             cursor: pointer;
         }
 
+        /* Эффект при нажатии */
         .custom-button:active {
             transform: scale(0.95);
+            opacity: 0.8;
         }
 
-        /* Иконка Play */
         .play-icon {
             margin-right: 8px;
             width: 20px;
@@ -56,24 +53,23 @@
 </head>
 <body>
 
-    <!-- Твоя верстка из Figma (адаптированная) -->
     <main class="flex flex-col justify-center items-center px-5 py-10 min-h-screen">
       <section class="flex flex-col gap-10 items-center w-full max-w-[390px]">
         
-        <button class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
+        <!-- Кнопки с ID для скрипта -->
+        <button id="google-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
           НАПИЛЬНИК
         </button>
 
-        <button class="custom-button max-w-[180px] h-16 rounded-[32px]">
+        <button id="yandex-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
           БОЛТИК
         </button>
 
-        <button class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
+        <button id="ferrari-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
           НЕКОТОРЫЙ
         </button>
 
-        <button class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
-          <!-- Вставляем иконку Play -->
+        <button id="lambo-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
           <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           РИСКУЮ
         </button>
@@ -83,16 +79,29 @@
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем приложение
+        tg.expand();
         tg.ready();
 
-        // Пример обработки клика (необязательно)
-        document.querySelectorAll('.custom-button').forEach(btn => {
+        // Функция для клика: Вибрация + Ссылка
+        function setupButton(id, url) {
+            const btn = document.getElementById(id);
             btn.addEventListener('click', () => {
-                tg.HapticFeedback.impactOccurred('medium'); // Вибрация при нажатии
-                console.log('Нажата кнопка: ' + btn.innerText);
+                // Пытаемся вызвать вибрацию
+                if (tg.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('heavy'); 
+                }
+                
+                // Открываем ссылку внутри Telegram или во внешнем браузере
+                tg.openLink(url);
             });
-        });
+        }
+
+        // Настраиваем каждую кнопку
+        setupButton('google-btn', 'https://www.google.com');
+        setupButton('yandex-btn', 'https://www.yandex.ru');
+        setupButton('ferrari-btn', 'https://www.ferrari.com');
+        setupButton('lambo-btn', 'https://www.lamborghini.com');
+
     </script>
 </body>
 </html>
