@@ -1,112 +1,131 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mini App</title>
-    <!-- ИСПРАВЛЕНО: Теперь библиотека Telegram подключена правильно -->
-    <script src="https://telegram.org"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <style>
-        :root {
-            --bg-color: var(--tg-theme-bg-color, #ffffff);
-            /* Цвет кнопок изменен на СИНИЙ */
-            --button-bg: #007AFF; 
-            --button-text: #ffffff;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-        body {
-            background-color: var(--bg-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: sans-serif;
-        }
+<title>Mini App</title>
 
-        .custom-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            font-weight: bold;
-            text-transform: uppercase;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.1s ease, opacity 0.2s;
-        }
+<!-- ПРАВИЛЬНОЕ подключение Telegram WebApp -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        /* Анимация нажатия */
-        .custom-button:active {
-            transform: scale(0.92);
-            opacity: 0.8;
-        }
+<script src="https://cdn.tailwindcss.com"></script>
 
-        .play-icon {
-            margin-right: 8px;
-            width: 20px;
-            height: 20px;
-            fill: currentColor;
-        }
-    </style>
+<style>
+:root {
+    --bg-color: var(--tg-theme-bg-color, #ffffff);
+    --button-bg: #007AFF;
+    --button-text: #ffffff;
+}
+
+body{
+    background-color: var(--bg-color);
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    font-family:sans-serif;
+}
+
+.custom-button{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    background-color:var(--button-bg);
+    color:var(--button-text);
+    font-weight:bold;
+    text-transform:uppercase;
+    border:none;
+    cursor:pointer;
+    transition:transform .1s ease, opacity .2s;
+}
+
+.custom-button:active{
+    transform:scale(.92);
+    opacity:.8;
+}
+
+.play-icon{
+    margin-right:8px;
+    width:20px;
+    height:20px;
+    fill:currentColor;
+}
+</style>
 </head>
+
 <body>
 
-    <main class="flex flex-col justify-center items-center px-5 py-10 w-full">
-      <section class="flex flex-col gap-6 items-center w-full max-w-[390px]">
-        
-        <button id="napilnik-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
-          НАПИЛЬНИК
-        </button>
+<main class="flex flex-col justify-center items-center px-5 py-10 w-full">
 
-        <button id="boltik-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
-          БОЛТИК
-        </button>
+<section class="flex flex-col gap-6 items-center w-full max-w-[390px]">
 
-        <button id="nekotory-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
-          НЕКОТОРЫЙ
-        </button>
+<button id="napilnik-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
+НАПИЛЬНИК
+</button>
 
-        <button id="riskuu-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
-          <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          РИСКУЮ
-        </button>
+<button id="boltik-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
+БОЛТИК
+</button>
 
-      </section>
-    </main>
+<button id="nekotory-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
+НЕКОТОРЫЙ
+</button>
 
-    <script>
-        // Инициализация Telegram WebApp
-        const tg = window.Telegram.WebApp;
-        
-        // Важно вызвать ready() для активации функций
-        tg.ready();
-        tg.expand();
+<button id="riskuu-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
+<svg class="play-icon" viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"/>
+</svg>
+РИСКУЮ
+</button>
 
-        function activateButton(id, url) {
-            const btn = document.getElementById(id);
-            if (!btn) return;
+</section>
 
-            btn.addEventListener('click', () => {
-                // Вибрация (Haptic Feedback) - работает на телефонах
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('medium'); 
-                }
-                
-                // Открытие ссылки через метод Telegram
-                tg.openLink(url);
-            });
+</main>
+
+<script>
+
+let tg = null;
+
+// Проверяем запущено ли внутри Telegram
+if (window.Telegram && window.Telegram.WebApp) {
+    tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+}
+
+function activateButton(id, url) {
+
+    const btn = document.getElementById(id);
+    if (!btn) return;
+
+    btn.addEventListener("click", function(){
+
+        // вибрация
+        if (tg && tg.HapticFeedback) {
+            tg.HapticFeedback.impactOccurred("medium");
         }
 
-        // Настройка ссылок для всех кнопок
-        activateButton('napilnik-btn', 'https://www.google.com');
-        activateButton('boltik-btn', 'https://www.yandex.ru');
-        activateButton('nekotory-btn', 'https://www.ferrari.com');
-        activateButton('riskuu-btn', 'https://www.lamborghini.com');
-    </script>
+        // открытие ссылки
+        if (tg) {
+            tg.openLink(url);
+        } else {
+            window.open(url, "_blank");
+        }
+
+    });
+
+}
+
+activateButton("napilnik-btn","https://www.google.com");
+activateButton("boltik-btn","https://www.yandex.ru");
+activateButton("nekotory-btn","https://www.ferrari.com");
+activateButton("riskuu-btn","https://www.lamborghini.com");
+
+</script>
+
 </body>
 </html>
