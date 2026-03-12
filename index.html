@@ -2,128 +2,177 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Mini App</title>
 
-<!-- ПРАВИЛЬНОЕ подключение Telegram WebApp -->
+<!-- Telegram SDK -->
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-:root {
-    --bg-color: var(--tg-theme-bg-color, #ffffff);
-    --button-bg: #007AFF;
-    --button-text: #ffffff;
-}
 
 body{
-    background-color: var(--bg-color);
-    margin:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    min-height:100vh;
-    font-family:sans-serif;
+margin:0;
+font-family: Inter, sans-serif;
+background:#27272a;
+}
+
+.dot{
+width:10px;
+height:10px;
+border-radius:50%;
+margin-right:10px;
+}
+
+.green-dot{
+background:#22c55e;
+}
+
+.white-dot{
+background:#ffffff;
 }
 
 .custom-button{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    background-color:var(--button-bg);
-    color:var(--button-text);
-    font-weight:bold;
-    text-transform:uppercase;
-    border:none;
-    cursor:pointer;
-    transition:transform .1s ease, opacity .2s;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+
+width:100%;
+max-width:320px;
+
+padding:16px;
+
+border-radius:30px;
+
+font-weight:700;
+letter-spacing:1px;
+
+transition:all .15s ease;
+
+background:#3f3f46;
+color:white;
 }
 
 .custom-button:active{
-    transform:scale(.92);
-    opacity:.8;
+transform:scale(.92);
+opacity:.8;
 }
 
-.play-icon{
-    margin-right:8px;
-    width:20px;
-    height:20px;
-    fill:currentColor;
+.button-group{
+display:flex;
+flex-direction:column;
+gap:12px;
+width:100%;
+align-items:center;
+margin-bottom:20px;
 }
+
+.status-indicator{
+display:flex;
+gap:10px;
+margin-bottom:40px;
+}
+
+.status-dot{
+width:12px;
+height:12px;
+border-radius:50%;
+background:#22c55e;
+}
+
+.large-button{
+max-width:360px;
+padding:20px;
+font-size:16px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<main class="flex flex-col justify-center items-center px-5 py-10 w-full">
+<main class="flex flex-col items-center px-4 py-14 w-full min-h-screen">
 
-<section class="flex flex-col gap-6 items-center w-full max-w-[390px]">
+<!-- Status indicators -->
+<div class="status-indicator">
+<div class="status-dot"></div>
+<div class="status-dot"></div>
+<div class="status-dot"></div>
+</div>
 
-<button id="napilnik-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
-НАПИЛЬНИК
+<!-- subscription buttons -->
+<div class="button-group">
+
+<button id="sub1" class="custom-button">
+<div class="dot green-dot"></div>
+ОПЛАТИТЬ ПОДПИСКУ
 </button>
 
-<button id="boltik-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
-БОЛТИК
+<button id="sub2" class="custom-button">
+<div class="dot green-dot"></div>
+ОПЛАТИТЬ ПОДПИСКУ
 </button>
 
-<button id="nekotory-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
-НЕКОТОРЫЙ
+</div>
+
+<!-- action buttons -->
+<div class="button-group">
+
+<button id="act1" class="custom-button">
+<div class="dot white-dot"></div>
+ШИЗИТЬ
 </button>
 
-<button id="riskuu-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
-<svg class="play-icon" viewBox="0 0 24 24">
-<path d="M8 5v14l11-7z"/>
-</svg>
-РИСКУЮ
+<button id="act2" class="custom-button">
+<div class="dot white-dot"></div>
+ШИЗИТЬ
 </button>
 
-</section>
+</div>
+
+<!-- big button -->
+<button id="mainBtn" class="custom-button large-button">
+<div class="dot white-dot"></div>
+ОПЛАТИТЬ ПОДПИСКУ
+</button>
 
 </main>
 
 <script>
 
-let tg = null;
+const tg = window.Telegram.WebApp;
 
-// Проверяем запущено ли внутри Telegram
-if (window.Telegram && window.Telegram.WebApp) {
-    tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
 
-    tg.ready();
-    tg.expand();
+function activateButton(id, url){
+
+const btn=document.getElementById(id);
+
+btn.addEventListener("click",()=>{
+
+if(tg.HapticFeedback){
+tg.HapticFeedback.impactOccurred("medium");
 }
 
-function activateButton(id, url) {
+tg.openLink(url);
 
-    const btn = document.getElementById(id);
-    if (!btn) return;
-
-    btn.addEventListener("click", function(){
-
-        // вибрация
-        if (tg && tg.HapticFeedback) {
-            tg.HapticFeedback.impactOccurred("medium");
-        }
-
-        // открытие ссылки
-        if (tg) {
-            tg.openLink(url);
-        } else {
-            window.open(url, "_blank");
-        }
-
-    });
+});
 
 }
 
-activateButton("napilnik-btn","https://www.google.com");
-activateButton("boltik-btn","https://www.yandex.ru");
-activateButton("nekotory-btn","https://www.ferrari.com");
-activateButton("riskuu-btn","https://www.lamborghini.com");
+activateButton("sub1","https://google.com");
+activateButton("sub2","https://google.com");
+
+activateButton("act1","https://yandex.ru");
+activateButton("act2","https://yandex.ru");
+
+activateButton("mainBtn","https://ferrari.com");
 
 </script>
 
