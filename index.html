@@ -3,74 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mini App</title>
-    <!-- ИСПРАВЛЕНО: Теперь библиотека Telegram подключается правильно -->
+    <title>TG Mini App</title>
+    <!-- Скрипт для работы с Telegram -->
     <script src="https://telegram.org"></script>
+    <!-- Tailwind CSS для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         :root {
+            /* Автоматический цвет фона из темы ТГ или белый */
             --bg-color: var(--tg-theme-bg-color, #ffffff);
-            --button-bg: #C8C8C8; 
-            --button-text: #000000;
         }
 
         body {
             background-color: var(--bg-color);
             margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: sans-serif;
+            padding: 0;
+            overflow: hidden; /* Убираем лишние скроллы */
         }
 
-        .custom-button {
+        /* Кастомный стиль кнопок (C8C8C8) */
+        .btn-custom {
+            background-color: #C8C8C8;
+            color: #000000;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            background-color: var(--button-bg);
-            color: var(--button-text);
-            font-weight: bold;
+            font-weight: 800;
             text-transform: uppercase;
             border: none;
             cursor: pointer;
-            transition: transform 0.1s ease;
+            transition: transform 0.1s ease, opacity 0.2s;
+            width: 100%;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .custom-button:active {
-            transform: scale(0.92);
+        /* Анимация нажатия */
+        .btn-custom:active {
+            transform: scale(0.94);
             opacity: 0.9;
         }
 
         .play-icon {
-            margin-right: 8px;
-            width: 20px;
-            height: 20px;
+            margin-right: 10px;
+            width: 24px;
+            height: 24px;
             fill: currentColor;
         }
     </style>
 </head>
 <body>
 
-    <main class="flex flex-col justify-center items-center px-5 py-10 w-full">
-      <section class="flex flex-col gap-6 items-center w-full max-w-[390px]">
+    <main class="flex flex-col justify-center items-center px-5 py-10 min-h-screen bg-white">
+      <section class="flex flex-col gap-10 items-center w-full max-w-[390px]">
         
-        <button id="napilnik-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
+        <!-- Кнопка НАПИЛЬНИК -->
+        <button id="btn-napilnik" class="btn-custom max-w-[260px] h-[72px] rounded-[36px]">
           НАПИЛЬНИК
         </button>
 
-        <button id="boltik-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
+        <!-- Кнопка БОЛТИК -->
+        <button id="btn-boltik" class="btn-custom max-w-[180px] h-16 rounded-[32px]">
           БОЛТИК
         </button>
 
-        <button id="nekotory-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
+        <!-- Кнопка НЕКОТОРЫЙ -->
+        <button class="btn-custom max-w-[250px] h-[72px] rounded-[36px]">
           НЕКОТОРЫЙ
         </button>
 
-        <button id="riskuu-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
-          <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <!-- Кнопка РИСКУЮ с иконкой -->
+        <button class="btn-custom max-w-[230px] h-[68px] rounded-[34px]">
+          <svg class="play-icon" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
           РИСКУЮ
         </button>
 
@@ -78,33 +84,30 @@
     </main>
 
     <script>
-        // Инициализация
+        // Инициализация Telegram WebApp
         const tg = window.Telegram.WebApp;
-        
-        // Сообщаем Telegram, что приложение готово
-        tg.ready();
-        tg.expand();
+        tg.expand(); // Разворачиваем приложение на весь экран
 
-        function activateButton(id, url) {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-
-            btn.addEventListener('click', () => {
-                // Вибрация (Haptic Feedback)
-                if (tg.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('medium'); 
-                }
-                
-                // ИСПОЛЬЗУЕМ openLink — это единственный надежный способ для Mini App
-                tg.openLink(url);
-            });
+        // Функция активации вибрации
+        function triggerHaptic() {
+            if (tg.HapticFeedback) {
+                // 'heavy' - сильная вибрация, можно 'medium' или 'light'
+                tg.HapticFeedback.impactOccurred('heavy');
+            }
         }
 
-        // Настройка всех ссылок
-        activateButton('napilnik-btn', 'https://www.google.com');
-        activateButton('boltik-btn', 'https://www.yandex.ru');
-        activateButton('nekotory-btn', 'https://www.ferrari.com');
-        activateButton('riskuu-btn', 'https://www.lamborghini.com');
+        // Назначаем события на кнопки
+        const napilnik = document.getElementById('btn-napilnik');
+        const boltik = document.getElementById('btn-boltik');
+
+        napilnik.addEventListener('click', () => {
+            triggerHaptic();
+            // Сюда можно добавить tg.openLink('...') если нужно
+        });
+
+        boltik.addEventListener('click', () => {
+            triggerHaptic();
+        });
     </script>
 </body>
 </html>
