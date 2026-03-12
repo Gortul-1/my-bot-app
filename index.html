@@ -2,57 +2,97 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- Запрещаем зум и сдвиги экрана -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Поисковики</title>
-    <!-- Правильная ссылка на скрипт Telegram -->
+    <title>Mini App</title>
+    <!-- Подключаем скрипт Telegram -->
     <script src="https://telegram.org"></script>
+    <!-- Подключаем Tailwind CSS для работы классов из твоего плагина -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
-        * {
-            box-sizing: border-box; /* Чтобы кнопки не вылезали за края */
+        /* Привязываем цвета к теме Telegram */
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #000000);
+            --button-bg: var(--tg-theme-button-color, #2481cc);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
         }
+
         body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
             font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+        }
+
+        /* Стили для твоих кнопок из дизайна */
+        .custom-button {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Отключаем прокрутку вовсе */
-        }
-        .container { text-align: center; width: 90%; }
-        h2 { margin-bottom: 20px; }
-        .btn {
-            display: block;
             width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
             font-weight: bold;
+            text-transform: uppercase;
+            transition: transform 0.1s ease;
+            border: none;
             cursor: pointer;
-            text-decoration: none;
-            color: white;
-            text-align: center;
         }
-        .google { background-color: #4285F4; }
-        .yahoo { background-color: #6001d2; }
+
+        .custom-button:active {
+            transform: scale(0.95);
+        }
+
+        /* Иконка Play */
+        .play-icon {
+            margin-right: 8px;
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Выберите поисковик:</h2>
-        <a href="https://www.google.com" class="btn google">Google</a>
-        <a href="https://www.yahoo.com" class="btn yahoo">Yahoo</a>
-    </div>
+
+    <!-- Твоя верстка из Figma (адаптированная) -->
+    <main class="flex flex-col justify-center items-center px-5 py-10 min-h-screen">
+      <section class="flex flex-col gap-10 items-center w-full max-w-[390px]">
+        
+        <button class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
+          НАПИЛЬНИК
+        </button>
+
+        <button class="custom-button max-w-[180px] h-16 rounded-[32px]">
+          БОЛТИК
+        </button>
+
+        <button class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
+          НЕКОТОРЫЙ
+        </button>
+
+        <button class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
+          <!-- Вставляем иконку Play -->
+          <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          РИСКУЮ
+        </button>
+
+      </section>
+    </main>
+
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на всё окно
-        tg.ready();  // Сообщить Telegram, что приложение готово
+        tg.expand(); // Разворачиваем приложение
+        tg.ready();
+
+        // Пример обработки клика (необязательно)
+        document.querySelectorAll('.custom-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                tg.HapticFeedback.impactOccurred('medium'); // Вибрация при нажатии
+                console.log('Нажата кнопка: ' + btn.innerText);
+            });
+        });
     </script>
 </body>
 </html>
