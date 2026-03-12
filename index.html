@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mini App</title>
-    <!-- ИСПРАВЛЕНО: Правильная ссылка на библиотеку Telegram WebApp -->
+    <!-- ИСПРАВЛЕНО: Теперь библиотека Telegram подключается правильно -->
     <script src="https://telegram.org"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -21,7 +21,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: screen;
+            min-height: 100vh;
             font-family: sans-serif;
         }
 
@@ -36,10 +36,9 @@
             text-transform: uppercase;
             border: none;
             cursor: pointer;
-            transition: transform 0.1s ease; /* Плавность анимации */
+            transition: transform 0.1s ease;
         }
 
-        /* АНИМАЦИЯ НАЖАТИЯ: Кнопка визуально уменьшается при клике */
         .custom-button:active {
             transform: scale(0.92);
             opacity: 0.9;
@@ -58,21 +57,19 @@
     <main class="flex flex-col justify-center items-center px-5 py-10 w-full">
       <section class="flex flex-col gap-6 items-center w-full max-w-[390px]">
         
-        <!-- КНОПКА 1: НАПИЛЬНИК (Ведет в Google) -->
         <button id="napilnik-btn" class="custom-button max-w-[260px] h-[72px] rounded-[36px]">
           НАПИЛЬНИК
         </button>
 
-        <!-- КНОПКА 2: БОЛТИК (Ведет в Yandex) -->
         <button id="boltik-btn" class="custom-button max-w-[180px] h-16 rounded-[32px]">
           БОЛТИК
         </button>
 
-        <button class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
+        <button id="nekotory-btn" class="custom-button max-w-[250px] h-[72px] rounded-[36px]">
           НЕКОТОРЫЙ
         </button>
 
-        <button class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
+        <button id="riskuu-btn" class="custom-button max-w-[230px] h-[68px] rounded-[34px]">
           <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
           РИСКУЮ
         </button>
@@ -81,29 +78,33 @@
     </main>
 
     <script>
-        // Инициализация Telegram WebApp
+        // Инициализация
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+        
+        // Сообщаем Telegram, что приложение готово
+        tg.ready();
+        tg.expand();
 
-        // Функция для настройки кнопки (Вибрация + Ссылка)
         function activateButton(id, url) {
             const btn = document.getElementById(id);
             if (!btn) return;
 
             btn.addEventListener('click', () => {
-                // 1. ВИБРАЦИЯ (работает только в мобильном приложении Telegram)
+                // Вибрация (Haptic Feedback)
                 if (tg.HapticFeedback) {
                     tg.HapticFeedback.impactOccurred('medium'); 
                 }
                 
-                // 2. ПЕРЕХОД ПО ССЫЛКЕ
+                // ИСПОЛЬЗУЕМ openLink — это единственный надежный способ для Mini App
                 tg.openLink(url);
             });
         }
 
-        // Применяем логику к нужным кнопкам
+        // Настройка всех ссылок
         activateButton('napilnik-btn', 'https://www.google.com');
         activateButton('boltik-btn', 'https://www.yandex.ru');
+        activateButton('nekotory-btn', 'https://www.ferrari.com');
+        activateButton('riskuu-btn', 'https://www.lamborghini.com');
     </script>
 </body>
 </html>
