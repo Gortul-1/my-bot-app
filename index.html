@@ -6,127 +6,90 @@
 
 <title>Mini App</title>
 
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-
 body{
 margin:0;
 font-family: Inter, sans-serif;
-background:#0f1113;
-color:white;
+background:#2a2a2a;
 }
-
-.top-steps{
-background:#d9d9d9;
-color:#000;
-font-size:28px;
-display:flex;
-justify-content:center;
-align-items:center;
-gap:25px;
-height:60px;
-font-weight:500;
-}
-
-.container{
-display:flex;
-flex-direction:column;
-align-items:center;
-padding-top:60px;
-}
-
-.title{
-font-size:64px;
-font-weight:500;
-margin-bottom:60px;
-}
-
-.input-label{
-width:80%;
-max-width:320px;
-font-size:18px;
-margin-bottom:8px;
-color:#d1d1d1;
-}
-
-.input-field{
-width:80%;
-max-width:320px;
-height:46px;
-border-radius:30px;
-background:#6b6b6b;
-border:none;
-padding-left:20px;
-color:white;
-outline:none;
-}
-
-.pay-btn{
-margin-top:180px;
-background:#6b6b6b;
-color:white;
-border:none;
-padding:16px 40px;
-border-radius:40px;
-font-size:24px;
-cursor:pointer;
-transition:all .15s ease;
-}
-
-.pay-btn:active{
-transform:scale(.92);
-opacity:.8;
-}
-
 </style>
 </head>
 
 <body>
 
-<div class="top-steps">
-<span>1</span>
-<span>→</span>
-<span>2</span>
-<span>→</span>
-<span>3</span>
+<div class="flex flex-col h-[844px] items-center justify-center gap-2.5 relative bg-[#2a2a2a]">
+
+<div class="flex flex-col h-[844px] gap-[42px] self-stretch w-full items-center relative">
+
+<div class="flex h-[155px] justify-center gap-[26.44px] self-stretch w-full items-center relative">
+
+<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
+<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
+<div class="relative w-[46.06px] h-[46.06px] bg-white rounded-[23.03px]"></div>
+<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
+<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
+
 </div>
 
-<div class="container">
+<div class="flex flex-wrap w-[300px] items-center justify-center gap-[11px_11px] relative">
 
-<div class="title">ОПлата</div>
+<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
 
-<div class="input-label">введите почту</div>
+<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
 
-<input class="input-field" type="email" placeholder="">
+<span class="text-white text-[7.5px] tracking-[1.73px]">
+ОПЛАТИТЬ ПОДПИСКУ
+</span>
 
-<button id="payButton" class="pay-btn">
-оплата
+</button>
+
+<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
+
+<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
+
+<span class="text-white text-[7.5px] tracking-[1.73px]">
+ОПЛАТИТЬ ПОДПИСКУ
+</span>
+
+</button>
+
+<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
+
+<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
+
+<span class="text-white text-[7.5px] tracking-[1.73px]">
+ШИЗИТЬ
+</span>
+
+</button>
+
+<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
+
+<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
+
+<span class="text-white text-[7.5px] tracking-[1.73px]">
+ШИЗИТЬ
+</span>
+
 </button>
 
 </div>
 
-<script>
+<button class="flex w-[236px] justify-center gap-[6.29px] px-0 py-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
 
-const tg = window.Telegram.WebApp;
+<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
 
-tg.ready();
-tg.expand();
+<span class="text-white text-[7.5px] tracking-[1.73px]">
+ОПЛАТИТЬ ПОДПИСКУ
+</span>
 
-const btn = document.getElementById("payButton");
+</button>
 
-btn.addEventListener("click",()=>{
+</div>
 
-if(tg.HapticFeedback){
-tg.HapticFeedback.impactOccurred("medium");
-}
-
-tg.openLink("https://google.com");
-
-});
-
-</script>
+</div>
 
 </body>
 </html>
