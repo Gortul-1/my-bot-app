@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org"></script>
     <style>
         body {
             margin: 0;
@@ -29,8 +29,9 @@
             content: '';
             position: absolute;
             top: 14px; /* ровно половина высоты кружка */
-            left: 0;
-            right: 0;
+            /* Отступы по 14px (радиус кружка), чтобы линия не вылезала за края */
+            left: 14px; 
+            right: 14px;
             height: 2px;
             background: #dcdcdc;
             z-index: 1;
@@ -40,8 +41,8 @@
         .progress-active-line {
             position: absolute;
             top: 14px;
-            left: 0;
-            width: 50%;
+            left: 14px; /* Начинается от центра 1-го кружка */
+            width: calc(50% - 14px); /* Доходит ровно до центра 2-го кружка */
             height: 2px;
             background: #bdbdbd;
             z-index: 1;
@@ -188,32 +189,17 @@
         const russian = document.getElementById("russian");
         const foreign = document.getElementById("foreign");
 
-        // Сброс обоих кнопок в неактивное состояние
         russian.classList.remove("neu-active");
-        russian.classList.add("neu-button");
         foreign.classList.remove("neu-active");
+        russian.classList.add("neu-button");
         foreign.classList.add("neu-button");
 
-        // Внутренний HTML для активной кнопки (с белой подложкой и черным текстом)
-        const activeContent = (text) => `
-            <div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
-                <div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">${text}</div>
-            </div>`;
-        
-        // Внутренний HTML для неактивной кнопки (серый текст, без подложки)
-        const inactiveContent = (text) => `
-            <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">${text}</div>`;
-
         if (bank === "russian") {
-            russian.classList.add("neu-active");
             russian.classList.remove("neu-button");
-            russian.innerHTML = activeContent("Российский<br>банк");
-            foreign.innerHTML = inactiveContent("Зарубежный<br>банк");
+            russian.classList.add("neu-active");
         } else {
-            foreign.classList.add("neu-active");
             foreign.classList.remove("neu-button");
-            foreign.innerHTML = activeContent("Зарубежный<br>банк");
-            russian.innerHTML = inactiveContent("Российский<br>банк");
+            foreign.classList.add("neu-active");
         }
     }
 
