@@ -18,6 +18,36 @@ font-family: Inter, sans-serif;
 background:#f6f6f6;
 }
 
+.progress-line{
+height:3px;
+background:#e5e5e5;
+flex:1;
+}
+
+.progress-line-active{
+background:#bdbdbd;
+}
+
+.progress-circle{
+width:28px;
+height:28px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:14px;
+}
+
+.progress-done{
+background:white;
+box-shadow:0 4px 6px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.progress-next{
+background:#efefef;
+box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
+}
+
 .neu-button{
 border-radius:49px;
 background:linear-gradient(99deg,#f7f7f7 0%,#f2f2f2 100%);
@@ -48,23 +78,37 @@ inset 0px 4.9px 4.9px rgba(0,0,0,0.25),
 
 <body>
 
-<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[11px]">
+<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
 
-<div class="flex justify-center gap-[47px] text-sm mb-4">
+<!-- progress -->
 
-<div class="text-[#181818]">
-Выбор
+<div class="flex flex-col items-center px-8 mb-6">
+
+<div class="flex items-center w-full gap-2">
+
+<div class="progress-circle progress-done">✓</div>
+
+<div class="progress-line progress-line-active"></div>
+
+<div class="progress-circle progress-next">✓</div>
+
+<div class="progress-line"></div>
+
+<div class="progress-circle progress-next">✓</div>
+
 </div>
 
-<div class="text-[#181818] opacity-20">
-Данные
-</div>
+<div class="flex justify-between w-full text-sm mt-2">
 
-<div class="text-[#181818] opacity-20">
-Оплата
-</div>
+<div class="text-black">Выбор</div>
+<div class="text-gray-400">Данные</div>
+<div class="text-gray-400">Оплата</div>
 
 </div>
+
+</div>
+
+<!-- товар -->
 
 <div class="flex flex-col px-[30px]">
 
@@ -97,6 +141,8 @@ inset 0px 4.9px 4.9px rgba(0,0,0,0.25),
 
 </div>
 
+<!-- способ оплаты -->
+
 <div class="px-[30px] mt-6">
 
 <div class="text-[#646464] text-base opacity-80 mb-4">
@@ -113,7 +159,7 @@ class="relative w-[155px] h-[84px] neu-active flex items-center justify-center">
 <div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
 
 <div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">
-Русский<br>банк
+Российский<br>банк
 </div>
 
 </div>
@@ -135,6 +181,8 @@ class="relative w-[155px] h-[84px] neu-button flex items-center justify-center">
 
 </div>
 
+<!-- email -->
+
 <div class="px-[30px] mt-6">
 
 <div class="text-[#646464] text-base opacity-80 mb-3">
@@ -149,6 +197,8 @@ class="w-full h-[30px] px-4 input-style"
 
 </div>
 
+<!-- цена -->
+
 <div class="px-[30px] mt-6">
 
 <div class="text-[#646464] text-[18px]">
@@ -161,11 +211,13 @@ class="w-full h-[30px] px-4 input-style"
 
 </div>
 
+<!-- кнопка -->
+
 <div class="flex items-center px-[30px] mt-6 gap-4">
 
 <button
 onclick="nextStep()"
-class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px]">
+class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
 
 далее
 
@@ -179,14 +231,14 @@ class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[
 
 <script>
 
-let selectedBank = "russian"
+let selectedBank="russian"
 
 function selectBank(bank){
 
-selectedBank = bank
+selectedBank=bank
 
-const russian = document.getElementById("russian")
-const foreign = document.getElementById("foreign")
+const russian=document.getElementById("russian")
+const foreign=document.getElementById("foreign")
 
 russian.classList.remove("neu-active")
 foreign.classList.remove("neu-active")
