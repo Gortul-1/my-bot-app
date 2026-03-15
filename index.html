@@ -1,3 +1,4 @@
+html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -11,7 +12,7 @@
             margin: 0;
             font-family: Inter, sans-serif;
             background: #f6f6f6;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
         /* progress bar styles */
@@ -35,6 +36,20 @@
             border-bottom: 2px solid #2b2b2b;
             transform: rotate(-45deg);
             margin-top: -2px;
+        }
+
+        .bridge-line {
+            flex: 1;
+            height: 2px;
+            background: #dcdcdc;
+            margin-top: 14px; /* Половина высоты кружка для центровки */
+            margin-left: -10px; /* Нахлест, чтобы не было дырок */
+            margin-right: -10px;
+            z-index: 0;
+        }
+
+        .bridge-active {
+            background: #bdbdbd;
         }
 
         /* bank buttons */
@@ -64,38 +79,40 @@
 
 <div class="flex flex-col h-screen bg-[#f6f6f6] pt-[20px]">
 
-    <!-- progress bar (центрированный) -->
-    <div class="px-10 mb-8 relative">
-        <!-- Фоновые линии -->
-        <div class="absolute top-[14px] left-10 right-10 h-[2px] bg-[#dcdcdc] z-0">
-            <!-- Активная часть линии (прогресс) -->
-            <div id="progress-line" class="h-full bg-[#bdbdbd] transition-all duration-300" style="width: 50%;"></div>
-        </div>
-
-        <div class="flex justify-between items-start relative z-10">
+    <!-- progress bar -->
+    <div class="px-10 mb-8">
+        <div class="flex items-start justify-between">
+            
             <!-- Шаг 1 -->
             <div class="flex flex-col items-center w-16">
                 <div class="progress-circle mb-2">
                     <div class="progress-check"></div>
                 </div>
-                <div class="text-xs font-medium text-black">Выбор</div>
+                <div class="text-[13px] font-medium text-black">Выбор</div>
             </div>
+
+            <!-- Мост 1 -->
+            <div class="bridge-line bridge-active"></div>
 
             <!-- Шаг 2 -->
             <div class="flex flex-col items-center w-16">
                 <div class="progress-circle mb-2">
                     <div class="progress-check opacity-30"></div>
                 </div>
-                <div class="text-xs font-medium text-gray-400">Данные</div>
+                <div class="text-[13px] font-medium text-gray-400">Данные</div>
             </div>
+
+            <!-- Мост 2 -->
+            <div class="bridge-line"></div>
 
             <!-- Шаг 3 -->
             <div class="flex flex-col items-center w-16">
                 <div class="progress-circle mb-2">
                     <div class="progress-check opacity-30"></div>
                 </div>
-                <div class="text-xs font-medium text-gray-400">Оплата</div>
+                <div class="text-[13px] font-medium text-gray-400">Оплата</div>
             </div>
+
         </div>
     </div>
 
@@ -106,11 +123,11 @@
             Доступ в закрытый<br>канал “Время бояться”
         </div>
 
-        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow-sm border border-gray-500/5">
             <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
             <div class="flex flex-col text-sm">
                 <div class="font-medium">Мета катакомбы</div>
-                <div class="text-[#8d8d8d] text-xs">Название канала изменено на "Мета катакомбы"</div>
+                <div class="text-[#8d8d8d] text-[11px] leading-tight">Название канала изменено на "Мета катакомбы"</div>
             </div>
         </div>
     </div>
@@ -120,13 +137,13 @@
         <div class="text-[#646464] text-base opacity-80 mb-4">Способ оплаты</div>
         <div class="flex gap-4">
             <button id="russian" onclick="selectBank('russian')" class="relative flex-1 h-[84px] neu-active flex items-center justify-center transition-all">
-                <div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2] inner-content">
+                <div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
                     <div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">Российский<br>банк</div>
                 </div>
             </button>
 
             <button id="foreign" onclick="selectBank('foreign')" class="relative flex-1 h-[84px] neu-button flex items-center justify-center transition-all">
-                <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold label-text">Зарубежный<br>банк</div>
+                <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">Зарубежный<br>банк</div>
             </button>
         </div>
     </div>
@@ -134,12 +151,12 @@
     <!-- email -->
     <div class="px-[30px] mt-8">
         <div class="text-[#646464] text-base opacity-80 mb-3">Ваш E-mail для отправки чека</div>
-        <input id="email" type="email" placeholder="example@mail.com" class="w-full h-[40px] px-5 input-style text-sm" />
+        <input id="email" type="email" class="w-full h-[40px] px-5 input-style text-sm" placeholder="mail@example.com" />
     </div>
 
     <!-- цена и кнопка -->
     <div class="mt-auto pb-10 px-[30px]">
-        <div class="flex justify-between items-end mb-6">
+        <div class="flex justify-between items-end mb-4">
             <div class="flex flex-col">
                 <div class="text-[#646464] text-sm uppercase tracking-wider">к оплате</div>
                 <div class="text-[32px] font-bold text-[#181818]">1200 р</div>
@@ -164,33 +181,27 @@
         const russian = document.getElementById("russian");
         const foreign = document.getElementById("foreign");
 
-        // Сброс классов
         russian.className = "relative flex-1 h-[84px] flex items-center justify-center transition-all";
         foreign.className = "relative flex-1 h-[84px] flex items-center justify-center transition-all";
 
+        const activeInner = `<div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">|TITLE|</div></div>`;
+        const inactiveInner = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">|TITLE|</div>`;
+
         if (bank === "russian") {
             russian.classList.add("neu-active");
+            russian.innerHTML = activeInner.replace('|TITLE|', 'Российский<br>банк');
             foreign.classList.add("neu-button");
-            
-            // Внутренний контент для активной кнопки РФ
-            russian.innerHTML = `<div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">Российский<br>банк</div></div>`;
-            foreign.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">Зарубежный<br>банк</div>`;
+            foreign.innerHTML = inactiveInner.replace('|TITLE|', 'Зарубежный<br>банк');
         } else {
             foreign.classList.add("neu-active");
+            foreign.innerHTML = activeInner.replace('|TITLE|', 'Зарубежный<br>банк');
             russian.classList.add("neu-button");
-            
-            // Внутренний контент для активной кнопки Зарубеж
-            foreign.innerHTML = `<div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">Зарубежный<br>банк</div></div>`;
-            russian.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">Российский<br>банк</div>`;
+            russian.innerHTML = inactiveInner.replace('|TITLE|', 'Российский<br>банк');
         }
     }
 
     function nextStep() {
         const email = document.getElementById("email").value;
-        if (!email) {
-            Telegram.WebApp.showAlert("Пожалуйста, введите E-mail");
-            return;
-        }
         Telegram.WebApp.sendData(JSON.stringify({
             email: email,
             bank: selectedBank
