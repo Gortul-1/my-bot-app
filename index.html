@@ -29,8 +29,8 @@
             content: '';
             position: absolute;
             top: 14px; /* ровно половина высоты кружка */
-            left: 0;
-            right: 0;
+            left: 14px;
+            right: 14px;
             height: 2px;
             background: #dcdcdc;
             z-index: 1;
@@ -40,8 +40,8 @@
         .progress-active-line {
             position: absolute;
             top: 14px;
-            left: 0;
-            width: 50%;
+            left: 14px;
+            width: calc(50% - 14px);
             height: 2px;
             background: #bdbdbd;
             z-index: 1;
