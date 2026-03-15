@@ -4,92 +4,194 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Mini App</title>
+<title>Оплата</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
 body{
 margin:0;
 font-family: Inter, sans-serif;
-background:#2a2a2a;
+background:#f6f6f6;
 }
 </style>
+
 </head>
 
 <body>
 
-<div class="flex flex-col h-[844px] items-center justify-center gap-2.5 relative bg-[#2a2a2a]">
+<div class="flex flex-col h-screen bg-[#f6f6f6]">
 
-<div class="flex flex-col h-[844px] gap-[42px] self-stretch w-full items-center relative">
+<!-- этапы -->
+<div class="flex justify-center gap-[47px] pt-6 text-sm">
 
-<div class="flex h-[155px] justify-center gap-[26.44px] self-stretch w-full items-center relative">
+<div class="text-black">
+Выбор
+</div>
 
-<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
-<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
-<div class="relative w-[46.06px] h-[46.06px] bg-white rounded-[23.03px]"></div>
-<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
-<div class="relative w-[41.79px] h-[41.79px] bg-white"></div>
+<div class="opacity-30">
+Данные
+</div>
+
+<div class="opacity-30">
+Оплата
+</div>
 
 </div>
 
-<div class="flex flex-wrap w-[300px] items-center justify-center gap-[11px_11px] relative">
+<!-- товар -->
+<div class="px-6 pt-6">
 
-<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
-
-<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
-
-<span class="text-white text-[7.5px] tracking-[1.73px]">
-ОПЛАТИТЬ ПОДПИСКУ
-</span>
-
-</button>
-
-<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
-
-<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
-
-<span class="text-white text-[7.5px] tracking-[1.73px]">
-ОПЛАТИТЬ ПОДПИСКУ
-</span>
-
-</button>
-
-<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
-
-<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
-
-<span class="text-white text-[7.5px] tracking-[1.73px]">
-ШИЗИТЬ
-</span>
-
-</button>
-
-<button class="inline-flex justify-center gap-[6.29px] p-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
-
-<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
-
-<span class="text-white text-[7.5px] tracking-[1.73px]">
-ШИЗИТЬ
-</span>
-
-</button>
-
+<div class="text-[#646464] text-base opacity-80 mb-2">
+Товар:
 </div>
 
-<button class="flex w-[236px] justify-center gap-[6.29px] px-0 py-[6.29px] bg-[#126649] rounded-[16.34px] items-center">
+<div class="text-[24px] font-semibold leading-[1.2]">
+Доступ в закрытый<br>
+канал "Время бояться"
+</div>
 
-<div class="w-[6.29px] h-[6.29px] bg-[#f8f8f8] rounded-[3.14px]"></div>
+<div class="mt-4 bg-white rounded-2xl shadow p-4 flex items-center gap-4">
 
-<span class="text-white text-[7.5px] tracking-[1.73px]">
-ОПЛАТИТЬ ПОДПИСКУ
-</span>
+<div class="w-10 h-10 rounded-full bg-red-700"></div>
 
-</button>
+<div class="flex flex-col text-sm">
+
+<div class="font-medium">
+Мета катакомбы
+</div>
+
+<div class="text-gray-400 text-xs">
+Название канала изменено на "Мета катакомбы"
+</div>
+
+</div>
 
 </div>
 
 </div>
+
+<!-- способ оплаты -->
+<div class="px-6 mt-6">
+
+<div class="text-[#646464] text-base opacity-80 mb-4">
+Способ оплаты
+</div>
+
+<div class="flex gap-4">
+
+<button
+id="russianBank"
+onclick="selectBank('russian')"
+class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-center text-sm font-medium"
+>
+
+Русский банк
+
+</button>
+
+<button
+id="foreignBank"
+onclick="selectBank('foreign')"
+class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-center text-sm text-gray-400"
+>
+
+Зарубежный банк
+
+</button>
+
+</div>
+
+</div>
+
+<!-- email -->
+<div class="px-6 mt-6">
+
+<div class="text-[#646464] text-base opacity-80 mb-3">
+Ваш E-mail для отправки чека
+</div>
+
+<input
+id="email"
+type="email"
+class="w-full h-[36px] rounded-[40px] shadow-inner px-4"
+/>
+
+</div>
+
+<!-- цена -->
+<div class="px-6 mt-8">
+
+<div class="text-[#646464] text-lg">
+к оплате
+</div>
+
+<div class="text-[32px] font-bold">
+1200 р
+</div>
+
+</div>
+
+<!-- кнопка -->
+<div class="px-6 mt-6 flex items-center gap-4">
+
+<button
+onclick="nextStep()"
+class="bg-black text-white text-xl px-6 py-3 rounded-[40px]"
+>
+
+далее
+
+</button>
+
+<div class="flex-1 h-[2px] bg-gray-300"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let selectedBank = "russian"
+
+function selectBank(bank){
+
+selectedBank = bank
+
+const r = document.getElementById("russianBank")
+const f = document.getElementById("foreignBank")
+
+if(bank === "russian"){
+r.classList.add("bg-black","text-white")
+f.classList.remove("bg-black","text-white")
+}else{
+f.classList.add("bg-black","text-white")
+r.classList.remove("bg-black","text-white")
+}
+
+}
+
+function nextStep(){
+
+const email = document.getElementById("email").value
+
+if(!email){
+alert("Введите email")
+return
+}
+
+Telegram.WebApp.sendData(JSON.stringify({
+email:email,
+bank:selectedBank
+}))
+
+}
+
+Telegram.WebApp.ready()
+
+</script>
 
 </body>
 </html>
