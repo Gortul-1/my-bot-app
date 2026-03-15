@@ -1,215 +1,296 @@
-html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org"></script>
-    <style>
-        body {
-            margin: 0;
-            font-family: Inter, sans-serif;
-            background: #f6f6f6;
-            overflow: hidden;
-        }
 
-        /* progress bar styles */
-        .progress-circle {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
-            position: relative;
-            z-index: 10;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        .progress-check {
-            width: 10px;
-            height: 6px;
-            border-left: 2px solid #2b2b2b;
-            border-bottom: 2px solid #2b2b2b;
-            transform: rotate(-45deg);
-            margin-top: -2px;
-        }
+<title>Mini App</title>
 
-        .bridge-line {
-            flex: 1;
-            height: 2px;
-            background: #dcdcdc;
-            margin-top: 14px; /* Половина высоты кружка для центровки */
-            margin-left: -10px; /* Нахлест, чтобы не было дырок */
-            margin-right: -10px;
-            z-index: 0;
-        }
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        .bridge-active {
-            background: #bdbdbd;
-        }
+<style>
 
-        /* bank buttons */
-        .neu-button {
-            border-radius: 49px;
-            background: linear-gradient(99deg, #f7f7f7 0%, #f2f2f2 100%);
-            box-shadow: inset 0px 4px 4px rgba(0,0,0,0.18), 0px 3px 6px rgba(0,0,0,0.08);
-        }
+body{
+margin:0;
+font-family:Inter, sans-serif;
+background:#f6f6f6;
+}
 
-        .neu-active {
-            border-radius: 49px;
-            background: linear-gradient(270deg, #928e8e 0%, #000 100%);
-            box-shadow: 0 8px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.15);
-        }
+/* progress bar */
 
-        /* input */
-        .input-style {
-            border-radius: 54px;
-            background: #fff;
-            box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
-            outline: none;
-        }
-    </style>
+.progress-wrapper{
+display:flex;
+align-items:center;
+width:100%;
+}
+
+.progress-line{
+flex:1;
+height:2px;
+background:#dcdcdc;
+}
+
+.progress-line-active{
+background:#bdbdbd;
+}
+
+.progress-circle{
+width:28px;
+height:28px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:white;
+box-shadow:
+0 3px 5px rgba(0,0,0,0.15),
+inset 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.progress-check{
+width:10px;
+height:6px;
+border-left:2px solid #2b2b2b;
+border-bottom:2px solid #2b2b2b;
+transform:rotate(-45deg);
+margin-top:-2px;
+}
+
+/* bank buttons */
+
+.neu-button{
+border-radius:49px;
+background:linear-gradient(99deg,#f7f7f7 0%,#f2f2f2 100%);
+box-shadow:
+inset 0px 4px 4px rgba(0,0,0,0.18),
+0px 3px 6px rgba(0,0,0,0.08);
+}
+
+.neu-active{
+border-radius:49px;
+background:linear-gradient(270deg,#928e8e 0%,#000 100%);
+box-shadow:
+0 8px 14px rgba(0,0,0,0.18),
+0 2px 4px rgba(0,0,0,0.12),
+inset 0 1px 2px rgba(255,255,255,0.15);
+}
+
+/* input */
+
+.input-style{
+border-radius:54px;
+background:#fff;
+box-shadow:
+inset 0px 4.9px 4.9px rgba(0,0,0,0.22),
+0px 4.9px 4.9px rgba(0,0,0,0.10);
+}
+
+</style>
+
 </head>
 
 <body>
 
-<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[20px]">
+<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
 
-    <!-- progress bar -->
-    <div class="px-10 mb-8">
-        <div class="flex items-start justify-between">
-            
-            <!-- Шаг 1 -->
-            <div class="flex flex-col items-center w-16">
-                <div class="progress-circle mb-2">
-                    <div class="progress-check"></div>
-                </div>
-                <div class="text-[13px] font-medium text-black">Выбор</div>
-            </div>
+<!-- progress -->
 
-            <!-- Мост 1 -->
-            <div class="bridge-line bridge-active"></div>
+<div class="flex flex-col items-center px-8 mb-6">
 
-            <!-- Шаг 2 -->
-            <div class="flex flex-col items-center w-16">
-                <div class="progress-circle mb-2">
-                    <div class="progress-check opacity-30"></div>
-                </div>
-                <div class="text-[13px] font-medium text-gray-400">Данные</div>
-            </div>
+<div class="progress-wrapper">
 
-            <!-- Мост 2 -->
-            <div class="bridge-line"></div>
+<div class="progress-circle">
+<div class="progress-check"></div>
+</div>
 
-            <!-- Шаг 3 -->
-            <div class="flex flex-col items-center w-16">
-                <div class="progress-circle mb-2">
-                    <div class="progress-check opacity-30"></div>
-                </div>
-                <div class="text-[13px] font-medium text-gray-400">Оплата</div>
-            </div>
+<div class="progress-line progress-line-active"></div>
 
-        </div>
-    </div>
+<div class="progress-circle">
+<div class="progress-check opacity-30"></div>
+</div>
 
-    <!-- товар -->
-    <div class="flex flex-col px-[30px]">
-        <div class="text-[#646464] text-base opacity-80 mb-2">Товар:</div>
-        <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-            Доступ в закрытый<br>канал “Время бояться”
-        </div>
+<div class="progress-line"></div>
 
-        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow-sm border border-gray-500/5">
-            <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-            <div class="flex flex-col text-sm">
-                <div class="font-medium">Мета катакомбы</div>
-                <div class="text-[#8d8d8d] text-[11px] leading-tight">Название канала изменено на "Мета катакомбы"</div>
-            </div>
-        </div>
-    </div>
+<div class="progress-circle">
+<div class="progress-check opacity-30"></div>
+</div>
 
-    <!-- способ оплаты -->
-    <div class="px-[30px] mt-8">
-        <div class="text-[#646464] text-base opacity-80 mb-4">Способ оплаты</div>
-        <div class="flex gap-4">
-            <button id="russian" onclick="selectBank('russian')" class="relative flex-1 h-[84px] neu-active flex items-center justify-center transition-all">
-                <div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
-                    <div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">Российский<br>банк</div>
-                </div>
-            </button>
+</div>
 
-            <button id="foreign" onclick="selectBank('foreign')" class="relative flex-1 h-[84px] neu-button flex items-center justify-center transition-all">
-                <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">Зарубежный<br>банк</div>
-            </button>
-        </div>
-    </div>
+<div class="flex justify-between w-full text-sm mt-2">
 
-    <!-- email -->
-    <div class="px-[30px] mt-8">
-        <div class="text-[#646464] text-base opacity-80 mb-3">Ваш E-mail для отправки чека</div>
-        <input id="email" type="email" class="w-full h-[40px] px-5 input-style text-sm" placeholder="mail@example.com" />
-    </div>
+<div class="text-black">Выбор</div>
+<div class="text-gray-400">Данные</div>
+<div class="text-gray-400">Оплата</div>
 
-    <!-- цена и кнопка -->
-    <div class="mt-auto pb-10 px-[30px]">
-        <div class="flex justify-between items-end mb-4">
-            <div class="flex flex-col">
-                <div class="text-[#646464] text-sm uppercase tracking-wider">к оплате</div>
-                <div class="text-[32px] font-bold text-[#181818]">1200 р</div>
-            </div>
-            
-            <div class="flex items-center gap-4 flex-1 justify-end">
-                <div class="h-[2px] bg-gray-300 w-12"></div>
-                <button onclick="nextStep()" class="flex items-center justify-center px-8 py-3 bg-[#1f1f1f] text-white text-[22px] font-medium rounded-[40px] shadow-xl active:scale-95 transition-transform">
-                    далее
-                </button>
-            </div>
-        </div>
-    </div>
+</div>
+
+</div>
+
+<!-- товар -->
+
+<div class="flex flex-col px-[30px]">
+
+<div class="text-[#646464] text-base opacity-80 mb-2">
+Товар:
+</div>
+
+<div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+Доступ в закрытый<br>
+канал “Время бояться”
+</div>
+
+<div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+
+<div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
+
+<div class="flex flex-col text-sm">
+
+<div class="font-medium">
+Мета катакомбы
+</div>
+
+<div class="text-[#8d8d8d] text-xs">
+Название канала изменено на "Мета катакомбы"
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- способ оплаты -->
+
+<div class="px-[30px] mt-6">
+
+<div class="text-[#646464] text-base opacity-80 mb-4">
+Способ оплаты
+</div>
+
+<div class="flex gap-[22px]">
+
+<button
+id="russian"
+onclick="selectBank('russian')"
+class="relative w-[155px] h-[84px] neu-active flex items-center justify-center">
+
+<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
+
+<div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">
+Российский<br>банк
+</div>
+
+</div>
+
+</button>
+
+<button
+id="foreign"
+onclick="selectBank('foreign')"
+class="relative w-[155px] h-[84px] neu-button flex items-center justify-center">
+
+<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">
+Зарубежный<br>банк
+</div>
+
+</button>
+
+</div>
+
+</div>
+
+<!-- email -->
+
+<div class="px-[30px] mt-6">
+
+<div class="text-[#646464] text-base opacity-80 mb-3">
+Ваш E-mail для отправки чека
+</div>
+
+<input
+id="email"
+type="email"
+class="w-full h-[30px] px-4 input-style"
+/>
+
+</div>
+
+<!-- цена -->
+
+<div class="px-[30px] mt-6">
+
+<div class="text-[#646464] text-[18px]">
+к оплате
+</div>
+
+<div class="text-[30px] font-bold text-[#181818]">
+1200 р
+</div>
+
+</div>
+
+<!-- кнопка -->
+
+<div class="flex items-center px-[30px] mt-6 gap-4">
+
+<button
+onclick="nextStep()"
+class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
+
+далее
+
+</button>
+
+<div class="flex-1 h-[2px] bg-gray-300"></div>
+
+</div>
 
 </div>
 
 <script>
-    let selectedBank = "russian";
 
-    function selectBank(bank) {
-        selectedBank = bank;
-        const russian = document.getElementById("russian");
-        const foreign = document.getElementById("foreign");
+let selectedBank="russian"
 
-        russian.className = "relative flex-1 h-[84px] flex items-center justify-center transition-all";
-        foreign.className = "relative flex-1 h-[84px] flex items-center justify-center transition-all";
+function selectBank(bank){
 
-        const activeInner = `<div class="absolute inset-[3px] flex items-center justify-center rounded-[45px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-semibold">|TITLE|</div></div>`;
-        const inactiveInner = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-semibold">|TITLE|</div>`;
+selectedBank=bank
 
-        if (bank === "russian") {
-            russian.classList.add("neu-active");
-            russian.innerHTML = activeInner.replace('|TITLE|', 'Российский<br>банк');
-            foreign.classList.add("neu-button");
-            foreign.innerHTML = inactiveInner.replace('|TITLE|', 'Зарубежный<br>банк');
-        } else {
-            foreign.classList.add("neu-active");
-            foreign.innerHTML = activeInner.replace('|TITLE|', 'Зарубежный<br>банк');
-            russian.classList.add("neu-button");
-            russian.innerHTML = inactiveInner.replace('|TITLE|', 'Российский<br>банк');
-        }
-    }
+const russian=document.getElementById("russian")
+const foreign=document.getElementById("foreign")
 
-    function nextStep() {
-        const email = document.getElementById("email").value;
-        Telegram.WebApp.sendData(JSON.stringify({
-            email: email,
-            bank: selectedBank
-        }));
-    }
+russian.classList.remove("neu-active")
+foreign.classList.remove("neu-active")
 
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
+russian.classList.add("neu-button")
+foreign.classList.add("neu-button")
+
+if(bank==="russian"){
+russian.classList.remove("neu-button")
+russian.classList.add("neu-active")
+}else{
+foreign.classList.remove("neu-button")
+foreign.classList.add("neu-active")
+}
+
+}
+
+function nextStep(){
+
+const email=document.getElementById("email").value
+
+Telegram.WebApp.sendData(JSON.stringify({
+email:email,
+bank:selectedBank
+}))
+
+}
+
+Telegram.WebApp.ready()
+Telegram.WebApp.expand()
+
 </script>
 
 </body>
