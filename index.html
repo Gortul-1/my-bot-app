@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://telegram.org"></script>
     <style>
         body {
             margin: 0;
@@ -29,8 +29,9 @@
             content: '';
             position: absolute;
             top: 14px; /* ровно половина высоты кружка */
-            left: 0;
-            right: 0;
+            /* Отступы по 14px (радиус кружка), чтобы линия была СТРОГО между центрами */
+            left: 14px; 
+            right: 14px;
             height: 2px;
             background: #dcdcdc;
             z-index: 1;
@@ -40,8 +41,8 @@
         .progress-active-line {
             position: absolute;
             top: 14px;
-            left: 0;
-            width: 50%;
+            left: 14px; /* Начинается от центра 1-го кружка */
+            width: calc(50% - 14px); /* Доходит ровно до центра 2-го кружка */
             height: 2px;
             background: #bdbdbd;
             z-index: 1;
