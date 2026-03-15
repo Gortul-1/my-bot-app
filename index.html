@@ -188,17 +188,32 @@
         const russian = document.getElementById("russian");
         const foreign = document.getElementById("foreign");
 
+        // Сброс обоих кнопок в неактивное состояние
         russian.classList.remove("neu-active");
-        foreign.classList.remove("neu-active");
         russian.classList.add("neu-button");
+        foreign.classList.remove("neu-active");
         foreign.classList.add("neu-button");
 
+        // Внутренний HTML для активной кнопки (с белой подложкой и черным текстом)
+        const activeContent = (text) => `
+            <div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
+                <div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">${text}</div>
+            </div>`;
+        
+        // Внутренний HTML для неактивной кнопки (серый текст, без подложки)
+        const inactiveContent = (text) => `
+            <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">${text}</div>`;
+
         if (bank === "russian") {
-            russian.classList.remove("neu-button");
             russian.classList.add("neu-active");
+            russian.classList.remove("neu-button");
+            russian.innerHTML = activeContent("Российский<br>банк");
+            foreign.innerHTML = inactiveContent("Зарубежный<br>банк");
         } else {
-            foreign.classList.remove("neu-button");
             foreign.classList.add("neu-active");
+            foreign.classList.remove("neu-button");
+            foreign.innerHTML = activeContent("Зарубежный<br>банк");
+            russian.innerHTML = inactiveContent("Российский<br>банк");
         }
     }
 
