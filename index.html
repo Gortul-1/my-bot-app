@@ -81,23 +81,29 @@ box-shadow:inset 0px 4px 4px rgba(0,0,0,0.18),0px 3px 6px rgba(0,0,0,0.08);
 transition: all 0.18s ease;
 }
 
-/* apple style shadow */
+/* ACTIVE BUTTON WITH SOFT GLOW */
 
 .neu-active{
 border-radius:49px;
 background:linear-gradient(270deg,#928e8e 0%,#000 100%);
+
+/* мягкая размытая обводка */
 box-shadow:
+0 0 0 3px rgba(0,0,0,0.05),
+0 0 25px rgba(0,0,0,0.35),
 0 18px 40px rgba(0,0,0,0.18),
 0 8px 18px rgba(0,0,0,0.12),
 0 2px 4px rgba(0,0,0,0.08);
+
 transition: all 0.18s ease;
 }
 
-/* iOS press effect */
+/* press effect */
 
 .neu-active:active{
 transform: translateY(2px);
 box-shadow:
+0 0 15px rgba(0,0,0,0.35),
 0 10px 20px rgba(0,0,0,0.16),
 0 4px 10px rgba(0,0,0,0.10),
 0 1px 2px rgba(0,0,0,0.06);
