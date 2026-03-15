@@ -13,12 +13,12 @@
       background: #f6f6f6;
     }
 
-    /* progress bar — точное позиционирование */
+    /* progress bar — точное центрирование */
     .progress-container {
       display: flex;
       flex-direction: column;
       width: 100%;
-      max-width: 320px; /* фиксированная ширина для контроля */
+      max-width: 320px;
       margin: 0 auto;
     }
 
@@ -35,25 +35,24 @@
       content: '';
       position: absolute;
       top: 50%;
-      left: 14px;  /* отступ, чтобы линия начиналась от центра первого кружка */
-      right: 14px; /* отступ, чтобы заканчивалась у центра последнего */
+      left: 14px;
+      right: 14px;
       height: 2px;
       background: #dcdcdc;
       transform: translateY(-50%);
       z-index: 0;
     }
 
-    /* активная часть линии (сейчас статична для наглядности, можно динамически менять) */
+    /* активная часть линии */
     .progress-line-fill {
       position: absolute;
       top: 50%;
       left: 14px;
-      width: calc(50% - 14px); /* заполнено до второго кружка, можно менять под шаг */
+      width: calc(50% - 14px);
       height: 2px;
       background: #bdbdbd;
       transform: translateY(-50%);
       z-index: 1;
-      transition: width 0.2s ease;
     }
 
     .progress-step {
@@ -87,30 +86,24 @@
       justify-content: space-between;
       width: 100%;
       margin-top: 8px;
-      padding: 0 0; /* точно под кружками */
     }
 
     .progress-labels span {
       text-align: center;
-      width: 28px; /* такая же ширина, как у кружка, чтобы центрировать */
-      margin-left: 0;
-      margin-right: 0;
+      width: 28px;
+      margin: 0 auto;
     }
 
-    /* первое слово — под первым кружком */
     .progress-labels span:first-child {
-      text-align: center;
       color: black;
     }
 
     .progress-labels span:nth-child(2) {
-      text-align: center;
-      color: #9ca3af; /* gray-400 */
+      color: #9ca3af;
     }
 
     .progress-labels span:last-child {
-      text-align: center;
-      color: #9ca3af; /* gray-400 */
+      color: #9ca3af;
     }
 
     /* bank buttons */
@@ -136,11 +129,10 @@
 </head>
 <body>
   <div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
-    <!-- progress bar с точным позиционированием -->
+    <!-- progress bar -->
     <div class="flex justify-center px-4 mb-6">
       <div class="progress-container">
         <div class="progress-track">
-          <!-- кружки точно по краям, линия внутри -->
           <div class="progress-step">
             <div class="progress-check"></div>
           </div>
@@ -150,10 +142,8 @@
           <div class="progress-step">
             <div class="progress-check inactive"></div>
           </div>
-          <!-- заполненная часть линии (до второго кружка) -->
           <div class="progress-line-fill"></div>
         </div>
-        <!-- подписи строго под кружками -->
         <div class="progress-labels">
           <span>Выбор</span>
           <span>Данные</span>
@@ -166,7 +156,7 @@
     <div class="flex flex-col px-[30px]">
       <div class="text-[#646464] text-base opacity-80 mb-2">Товар:</div>
       <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-        Доступ в закрытый<br>канал “Время бояться”
+        Доступ в закрытый<br>канал "Время бояться"
       </div>
       <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
         <div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
