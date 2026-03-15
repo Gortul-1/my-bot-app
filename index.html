@@ -1,60 +1,85 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Оплата</title>
+<title>Mini App</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+
 body{
 margin:0;
 font-family: Inter, sans-serif;
 background:#f6f6f6;
 }
+
+.neu-button{
+border-radius:49px;
+background:linear-gradient(99deg,#f7f7f7 0%,#f2f2f2 100%);
+box-shadow:
+inset 0px 4px 4px rgba(0,0,0,0.22),
+0px 4px 4px rgba(0,0,0,0.08);
+}
+
+.neu-active{
+border-radius:49px;
+background:linear-gradient(270deg,#928e8e 0%,#000 100%);
+box-shadow:
+0 6px 10px rgba(0,0,0,0.25),
+inset 0 2px 3px rgba(255,255,255,0.15);
+}
+
+.input-style{
+border-radius:54px;
+background:#fff;
+box-shadow:
+inset 0px 4.9px 4.9px rgba(0,0,0,0.25),
+0px 4.9px 4.9px rgba(0,0,0,0.12);
+}
+
 </style>
 
 </head>
 
 <body>
 
-<div class="flex flex-col h-screen bg-[#f6f6f6]">
+<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[11px]">
 
-<!-- этапы -->
-<div class="flex justify-center gap-[47px] pt-6 text-sm">
+<div class="flex justify-center gap-[47px] text-sm mb-4">
 
-<div class="text-black">
+<div class="text-[#181818]">
 Выбор
 </div>
 
-<div class="opacity-30">
+<div class="text-[#181818] opacity-20">
 Данные
 </div>
 
-<div class="opacity-30">
+<div class="text-[#181818] opacity-20">
 Оплата
 </div>
 
 </div>
 
-<!-- товар -->
-<div class="px-6 pt-6">
+<div class="flex flex-col px-[30px]">
 
 <div class="text-[#646464] text-base opacity-80 mb-2">
 Товар:
 </div>
 
-<div class="text-[24px] font-semibold leading-[1.2]">
+<div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
 Доступ в закрытый<br>
-канал "Время бояться"
+канал “Время бояться”
 </div>
 
-<div class="mt-4 bg-white rounded-2xl shadow p-4 flex items-center gap-4">
+<div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
 
-<div class="w-10 h-10 rounded-full bg-red-700"></div>
+<div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
 
 <div class="flex flex-col text-sm">
 
@@ -62,7 +87,7 @@ background:#f6f6f6;
 Мета катакомбы
 </div>
 
-<div class="text-gray-400 text-xs">
+<div class="text-[#8d8d8d] text-xs">
 Название канала изменено на "Мета катакомбы"
 </div>
 
@@ -72,32 +97,37 @@ background:#f6f6f6;
 
 </div>
 
-<!-- способ оплаты -->
-<div class="px-6 mt-6">
+<div class="px-[30px] mt-6">
 
 <div class="text-[#646464] text-base opacity-80 mb-4">
 Способ оплаты
 </div>
 
-<div class="flex gap-4">
+<div class="flex gap-[22px]">
 
 <button
-id="russianBank"
+id="russian"
 onclick="selectBank('russian')"
-class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-center text-sm font-medium"
->
+class="relative w-[155px] h-[84px] neu-active flex items-center justify-center">
 
-Русский банк
+<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
+
+<div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">
+Русский<br>банк
+</div>
+
+</div>
 
 </button>
 
 <button
-id="foreignBank"
+id="foreign"
 onclick="selectBank('foreign')"
-class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-center text-sm text-gray-400"
->
+class="relative w-[155px] h-[84px] neu-button flex items-center justify-center">
 
-Зарубежный банк
+<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">
+Зарубежный<br>банк
+</div>
 
 </button>
 
@@ -105,8 +135,7 @@ class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-
 
 </div>
 
-<!-- email -->
-<div class="px-6 mt-6">
+<div class="px-[30px] mt-6">
 
 <div class="text-[#646464] text-base opacity-80 mb-3">
 Ваш E-mail для отправки чека
@@ -115,31 +144,28 @@ class="flex-1 h-[60px] rounded-[40px] bg-white shadow flex items-center justify-
 <input
 id="email"
 type="email"
-class="w-full h-[36px] rounded-[40px] shadow-inner px-4"
+class="w-full h-[30px] px-4 input-style"
 />
 
 </div>
 
-<!-- цена -->
-<div class="px-6 mt-8">
+<div class="px-[30px] mt-6">
 
-<div class="text-[#646464] text-lg">
+<div class="text-[#646464] text-[18px]">
 к оплате
 </div>
 
-<div class="text-[32px] font-bold">
+<div class="text-[30px] font-bold text-[#181818]">
 1200 р
 </div>
 
 </div>
 
-<!-- кнопка -->
-<div class="px-6 mt-6 flex items-center gap-4">
+<div class="flex items-center px-[30px] mt-6 gap-4">
 
 <button
 onclick="nextStep()"
-class="bg-black text-white text-xl px-6 py-3 rounded-[40px]"
->
+class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px]">
 
 далее
 
@@ -151,7 +177,6 @@ class="bg-black text-white text-xl px-6 py-3 rounded-[40px]"
 
 </div>
 
-
 <script>
 
 let selectedBank = "russian"
@@ -160,27 +185,28 @@ function selectBank(bank){
 
 selectedBank = bank
 
-const r = document.getElementById("russianBank")
-const f = document.getElementById("foreignBank")
+const russian = document.getElementById("russian")
+const foreign = document.getElementById("foreign")
 
-if(bank === "russian"){
-r.classList.add("bg-black","text-white")
-f.classList.remove("bg-black","text-white")
+russian.classList.remove("neu-active")
+foreign.classList.remove("neu-active")
+
+russian.classList.add("neu-button")
+foreign.classList.add("neu-button")
+
+if(bank==="russian"){
+russian.classList.remove("neu-button")
+russian.classList.add("neu-active")
 }else{
-f.classList.add("bg-black","text-white")
-r.classList.remove("bg-black","text-white")
+foreign.classList.remove("neu-button")
+foreign.classList.add("neu-active")
 }
 
 }
 
 function nextStep(){
 
-const email = document.getElementById("email").value
-
-if(!email){
-alert("Введите email")
-return
-}
+const email=document.getElementById("email").value
 
 Telegram.WebApp.sendData(JSON.stringify({
 email:email,
@@ -190,6 +216,7 @@ bank:selectedBank
 }
 
 Telegram.WebApp.ready()
+Telegram.WebApp.expand()
 
 </script>
 
