@@ -1,241 +1,204 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mini App</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: Inter, sans-serif;
-      background: #f6f6f6;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, sans-serif;
+            background: #f6f6f6;
+        }
 
-    /* progress bar — точное центрирование */
-    .progress-container {
-      display: flex;
-      flex-direction: column;
-      width: 100%;
-      max-width: 320px;
-      margin: 0 auto;
-    }
+        /* progress bar */
+        .progress-circle {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
 
-    .progress-track {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-      position: relative;
-    }
+        .progress-check {
+            width: 10px;
+            height: 6px;
+            border-left: 2px solid #2b2b2b;
+            border-bottom: 2px solid #2b2b2b;
+            transform: rotate(-45deg);
+            margin-top: -2px;
+        }
 
-    /* линия позади кружков */
-    .progress-track::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 14px;
-      right: 14px;
-      height: 2px;
-      background: #dcdcdc;
-      transform: translateY(-50%);
-      z-index: 0;
-    }
+        .progress-line {
+            flex: 1;
+            height: 2px;
+            background: #dcdcdc;
+            margin-top: 14px; /* центровка по высоте кружка */
+            margin-left: -4px;
+            margin-right: -4px;
+            z-index: 1;
+        }
 
-    /* активная часть линии */
-    .progress-line-fill {
-      position: absolute;
-      top: 50%;
-      left: 14px;
-      width: calc(50% - 14px);
-      height: 2px;
-      background: #bdbdbd;
-      transform: translateY(-50%);
-      z-index: 1;
-    }
+        .progress-line-active {
+            background: #bdbdbd;
+        }
 
-    .progress-step {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
-      position: relative;
-      z-index: 2;
-    }
+        /* bank buttons */
+        .neu-button {
+            border-radius: 49px;
+            background: linear-gradient(99deg, #f7f7f7 0%, #f2f2f2 100%);
+            box-shadow: inset 0px 4px 4px rgba(0,0,0,0.18), 0px 3px 6px rgba(0,0,0,0.08);
+        }
 
-    .progress-check {
-      width: 10px;
-      height: 6px;
-      border-left: 2px solid #2b2b2b;
-      border-bottom: 2px solid #2b2b2b;
-      transform: rotate(-45deg);
-      margin-top: -2px;
-    }
+        .neu-active {
+            border-radius: 49px;
+            background: linear-gradient(270deg, #928e8e 0%, #000 100%);
+            box-shadow: 0 8px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.15);
+        }
 
-    .progress-check.inactive {
-      opacity: 0.3;
-    }
-
-    .progress-labels {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-top: 8px;
-    }
-
-    .progress-labels span {
-      text-align: center;
-      width: 28px;
-      margin: 0 auto;
-    }
-
-    .progress-labels span:first-child {
-      color: black;
-    }
-
-    .progress-labels span:nth-child(2) {
-      color: #9ca3af;
-    }
-
-    .progress-labels span:last-child {
-      color: #9ca3af;
-    }
-
-    /* bank buttons */
-    .neu-button {
-      border-radius: 49px;
-      background: linear-gradient(99deg, #f7f7f7 0%, #f2f2f2 100%);
-      box-shadow: inset 0px 4px 4px rgba(0,0,0,0.18), 0px 3px 6px rgba(0,0,0,0.08);
-    }
-
-    .neu-active {
-      border-radius: 49px;
-      background: linear-gradient(270deg, #928e8e 0%, #000 100%);
-      box-shadow: 0 8px 14px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.15);
-    }
-
-    /* input */
-    .input-style {
-      border-radius: 54px;
-      background: #fff;
-      box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
-    }
-  </style>
+        /* input */
+        .input-style {
+            border-radius: 54px;
+            background: #fff;
+            box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
+        }
+    </style>
 </head>
+
 <body>
-  <div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
-    <!-- progress bar -->
-    <div class="flex justify-center px-4 mb-6">
-      <div class="progress-container">
-        <div class="progress-track">
-          <div class="progress-step">
-            <div class="progress-check"></div>
-          </div>
-          <div class="progress-step">
-            <div class="progress-check inactive"></div>
-          </div>
-          <div class="progress-step">
-            <div class="progress-check inactive"></div>
-          </div>
-          <div class="progress-line-fill"></div>
+
+<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
+
+    <!-- progress -->
+    <div class="px-8 mb-6">
+        <div class="flex items-start justify-between">
+            
+            <!-- Шаг 1 -->
+            <div class="flex flex-col items-center w-12">
+                <div class="progress-circle">
+                    <div class="progress-check"></div>
+                </div>
+                <div class="text-black text-sm mt-2">Выбор</div>
+            </div>
+
+            <div class="progress-line progress-line-active"></div>
+
+            <!-- Шаг 2 -->
+            <div class="flex flex-col items-center w-12">
+                <div class="progress-circle">
+                    <div class="progress-check opacity-30"></div>
+                </div>
+                <div class="text-gray-400 text-sm mt-2">Данные</div>
+            </div>
+
+            <div class="progress-line"></div>
+
+            <!-- Шаг 3 -->
+            <div class="flex flex-col items-center w-12">
+                <div class="progress-circle">
+                    <div class="progress-check opacity-30"></div>
+                </div>
+                <div class="text-gray-400 text-sm mt-2">Оплата</div>
+            </div>
+
         </div>
-        <div class="progress-labels">
-          <span>Выбор</span>
-          <span>Данные</span>
-          <span>Оплата</span>
-        </div>
-      </div>
     </div>
 
     <!-- товар -->
     <div class="flex flex-col px-[30px]">
-      <div class="text-[#646464] text-base opacity-80 mb-2">Товар:</div>
-      <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-        Доступ в закрытый<br>канал "Время бояться"
-      </div>
-      <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-        <div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
-        <div class="flex flex-col text-sm">
-          <div class="font-medium">Мета катакомбы</div>
-          <div class="text-[#8d8d8d] text-xs">Название канала изменено на "Мета катакомбы"</div>
+        <div class="text-[#646464] text-base opacity-80 mb-2">Товар:</div>
+        <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+            Доступ в закрытый<br>канал “Время бояться”
         </div>
-      </div>
+
+        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+            <div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
+            <div class="flex flex-col text-sm">
+                <div class="font-medium">Мета катакомбы</div>
+                <div class="text-[#8d8d8d] text-xs">Название канала изменено на "Мета катакомбы"</div>
+            </div>
+        </div>
     </div>
 
     <!-- способ оплаты -->
     <div class="px-[30px] mt-6">
-      <div class="text-[#646464] text-base opacity-80 mb-4">Способ оплаты</div>
-      <div class="flex gap-[22px]">
-        <button id="russian" onclick="selectBank('russian')" class="relative w-[155px] h-[84px] neu-active flex items-center justify-center">
-          <div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
-            <div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div>
-          </div>
-        </button>
-        <button id="foreign" onclick="selectBank('foreign')" class="relative w-[155px] h-[84px] neu-button flex items-center justify-center">
-          <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div>
-        </button>
-      </div>
+        <div class="text-[#646464] text-base opacity-80 mb-4">Способ оплаты</div>
+        <div class="flex gap-[22px]">
+            <button id="russian" onclick="selectBank('russian')" class="relative w-[155px] h-[84px] neu-active flex items-center justify-center">
+                <div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]">
+                    <div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div>
+                </div>
+            </button>
+            <button id="foreign" onclick="selectBank('foreign')" class="relative w-[155px] h-[84px] neu-button flex items-center justify-center">
+                <div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div>
+            </button>
+        </div>
     </div>
 
     <!-- email -->
     <div class="px-[30px] mt-6">
-      <div class="text-[#646464] text-base opacity-80 mb-3">Ваш E-mail для отправки чека</div>
-      <input id="email" type="email" class="w-full h-[30px] px-4 input-style" />
+        <div class="text-[#646464] text-base opacity-80 mb-3">Ваш E-mail для отправки чека</div>
+        <input id="email" type="email" class="w-full h-[30px] px-4 input-style" />
     </div>
 
     <!-- цена -->
     <div class="px-[30px] mt-6">
-      <div class="text-[#646464] text-[18px]">к оплате</div>
-      <div class="text-[30px] font-bold text-[#181818]">1200 р</div>
+        <div class="text-[#646464] text-[18px]">к оплате</div>
+        <div class="text-[30px] font-bold text-[#181818]">1200 р</div>
     </div>
 
     <!-- кнопка -->
     <div class="flex items-center px-[30px] mt-6 gap-4">
-      <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
-        далее
-      </button>
-      <div class="flex-1 h-[2px] bg-gray-300"></div>
+        <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">далее</button>
+        <div class="flex-1 h-[2px] bg-gray-300"></div>
     </div>
-  </div>
 
-  <script>
-    let selectedBank = "russian";
+</div>
+
+<script>
+    let selectedBank = "russian"
 
     function selectBank(bank) {
-      selectedBank = bank;
+        selectedBank = bank
+        const russian = document.getElementById("russian")
+        const foreign = document.getElementById("foreign")
+        russian.classList.remove("neu-active")
+        foreign.classList.remove("neu-active")
+        russian.classList.add("neu-button")
+        foreign.classList.add("neu-button")
 
-      const russian = document.getElementById("russian");
-      const foreign = document.getElementById("foreign");
-
-      russian.classList.remove("neu-active");
-      foreign.classList.remove("neu-active");
-      russian.classList.add("neu-button");
-      foreign.classList.add("neu-button");
-
-      if (bank === "russian") {
-        russian.classList.remove("neu-button");
-        russian.classList.add("neu-active");
-      } else {
-        foreign.classList.remove("neu-button");
-        foreign.classList.add("neu-active");
-      }
+        if (bank === "russian") {
+            russian.classList.remove("neu-button")
+            russian.classList.add("neu-active")
+            russian.innerHTML = `<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div></div>`;
+            foreign.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div>`;
+        } else {
+            foreign.classList.remove("neu-button")
+            foreign.classList.add("neu-active")
+            foreign.innerHTML = `<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div></div>`;
+            russian.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div>`;
+        }
     }
 
     function nextStep() {
-      const email = document.getElementById("email").value;
-      Telegram.WebApp.sendData(JSON.stringify({
-        email: email,
-        bank: selectedBank
-      }));
+        const email = document.getElementById("email").value
+        Telegram.WebApp.sendData(JSON.stringify({
+            email: email,
+            bank: selectedBank
+        }))
     }
 
-    Telegram.WebApp.ready();
-    Telegram.WebApp.expand();
-  </script>
+    Telegram.WebApp.ready()
+    Telegram.WebApp.expand()
+</script>
+
 </body>
 </html>
