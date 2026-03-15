@@ -13,7 +13,40 @@
             background: #f6f6f6;
         }
 
-        /* progress bar */
+        /* progress bar container */
+        .progress-nav {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 280px; /* ограничение ширины для точности */
+            margin: 0 auto;
+        }
+
+        /* Сплошная серая линия под кружками */
+        .progress-nav::before {
+            content: '';
+            position: absolute;
+            top: 14px; /* ровно половина высоты кружка */
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #dcdcdc;
+            z-index: 1;
+        }
+
+        /* Активная часть линии (от 1-го до 2-го кружка) */
+        .progress-active-line {
+            position: absolute;
+            top: 14px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: #bdbdbd;
+            z-index: 1;
+        }
+
         .progress-circle {
             width: 28px;
             height: 28px;
@@ -35,21 +68,6 @@
             border-bottom: 2px solid #2b2b2b;
             transform: rotate(-45deg);
             margin-top: -2px;
-        }
-
-        .progress-line {
-            flex: 1;
-            height: 2px;
-            background: #dcdcdc;
-            margin-top: 14px; /* центровка по высоте кружка */
-            /* ИЗМЕНЕНИЕ: увеличен нахлест, чтобы не было дырок */
-            margin-left: -14px; 
-            margin-right: -14px;
-            z-index: 1;
-        }
-
-        .progress-line-active {
-            background: #bdbdbd;
         }
 
         /* bank buttons */
@@ -78,36 +96,34 @@
 
 <div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
 
-    <!-- progress -->
+    <!-- progress section -->
     <div class="px-8 mb-6">
-        <div class="flex items-start justify-between">
+        <div class="progress-nav">
             
+            <div class="progress-active-line"></div>
+
             <!-- Шаг 1 -->
-            <div class="flex flex-col items-center w-16">
+            <div class="flex flex-col items-center">
                 <div class="progress-circle">
                     <div class="progress-check"></div>
                 </div>
-                <div class="text-black text-sm mt-2">Выбор</div>
+                <div class="text-black text-xs mt-2 font-medium">Выбор</div>
             </div>
-
-            <div class="progress-line progress-line-active"></div>
 
             <!-- Шаг 2 -->
-            <div class="flex flex-col items-center w-16">
+            <div class="flex flex-col items-center">
                 <div class="progress-circle">
                     <div class="progress-check opacity-30"></div>
                 </div>
-                <div class="text-gray-400 text-sm mt-2">Данные</div>
+                <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
             </div>
 
-            <div class="progress-line"></div>
-
             <!-- Шаг 3 -->
-            <div class="flex flex-col items-center w-16">
+            <div class="flex flex-col items-center">
                 <div class="progress-circle">
                     <div class="progress-check opacity-30"></div>
                 </div>
-                <div class="text-gray-400 text-sm mt-2">Оплата</div>
+                <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
             </div>
 
         </div>
@@ -121,7 +137,7 @@
         </div>
 
         <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-            <div class="w-[44px] h-[44px] rounded-full bg-red-800"></div>
+            <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
             <div class="flex flex-col text-sm">
                 <div class="font-medium">Мета катакомбы</div>
                 <div class="text-[#8d8d8d] text-xs">Название канала изменено на "Мета катакомбы"</div>
@@ -165,40 +181,37 @@
 </div>
 
 <script>
-    let selectedBank = "russian"
+    let selectedBank = "russian";
 
     function selectBank(bank) {
-        selectedBank = bank
-        const russian = document.getElementById("russian")
-        const foreign = document.getElementById("foreign")
-        russian.classList.remove("neu-active")
-        foreign.classList.remove("neu-active")
-        russian.classList.add("neu-button")
-        foreign.classList.add("neu-button")
+        selectedBank = bank;
+        const russian = document.getElementById("russian");
+        const foreign = document.getElementById("foreign");
+
+        russian.classList.remove("neu-active");
+        foreign.classList.remove("neu-active");
+        russian.classList.add("neu-button");
+        foreign.classList.add("neu-button");
 
         if (bank === "russian") {
-            russian.classList.remove("neu-button")
-            russian.classList.add("neu-active")
-            russian.innerHTML = `<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div></div>`;
-            foreign.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div>`;
+            russian.classList.remove("neu-button");
+            russian.classList.add("neu-active");
         } else {
-            foreign.classList.remove("neu-button")
-            foreign.classList.add("neu-active")
-            foreign.innerHTML = `<div class="absolute w-[125px] h-[60px] flex items-center justify-center rounded-[75px] bg-gradient-to-r from-[#f7f7f7] to-[#f2f2f2]"><div class="text-[#353535] text-sm text-center leading-[1.2] font-medium">Зарубежный<br>банк</div></div>`;
-            russian.innerHTML = `<div class="text-[#bab8b8] text-sm text-center leading-[1.2] font-medium">Российский<br>банк</div>`;
+            foreign.classList.remove("neu-button");
+            foreign.classList.add("neu-active");
         }
     }
 
     function nextStep() {
-        const email = document.getElementById("email").value
+        const email = document.getElementById("email").value;
         Telegram.WebApp.sendData(JSON.stringify({
             email: email,
             bank: selectedBank
-        }))
+        }));
     }
 
-    Telegram.WebApp.ready()
-    Telegram.WebApp.expand()
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
 </script>
 
 </body>
