@@ -274,7 +274,6 @@ button, input, textarea, select, a {
   let focusTimer = null;
   let viewportTimer = null;
   let hideKeyboardTimer = null;
-  let pendingKeyboardHide = false;
   let lastViewportHeight = 0;
   let lastKnownScrollTop = 0;
 
@@ -282,7 +281,6 @@ button, input, textarea, select, a {
   const app = document.getElementById("app");
   const content = document.getElementById("content");
   const emailInput = document.getElementById("email");
-  const emailWrap = document.getElementById("emailWrap");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -296,8 +294,9 @@ button, input, textarea, select, a {
 
   function updateAppHeight() {
     const height = getViewportHeight();
-    lastViewportHeight = height;
+    if (!height || height < 1) return;
 
+    lastViewportHeight = height;
     document.documentElement.style.height = height + "px";
     document.body.style.height = height + "px";
     app.style.height = height + "px";
@@ -318,6 +317,8 @@ button, input, textarea, select, a {
   }
 
   function selectBank(bank) {
+    if (bank !== "russian" && bank !== "foreign") return;
+    if (selectedBank === bank) return;
     selectedBank = bank;
     updateBankButtons();
   }
@@ -330,24 +331,30 @@ button, input, textarea, select, a {
   }
 
   function nextStep() {
-    const email = emailInput.value.trim();
     const payload = {
-      email: email,
+      email: emailInput.value.trim(),
       bank: selectedBank
     };
 
     if (tg && typeof tg.sendData === "function") {
-      tg.sendData(JSON.stringify(payload));
+      try {
+        tg.sendData(JSON.stringify(payload));
+      } catch (e) {
+        console.log(payload);
+      }
     } else {
       console.log(payload);
     }
   }
 
-  function hideKeyboard(immediate) {
+  function cancelPendingKeyboardHide() {
     clearTimeout(hideKeyboardTimer);
+  }
+
+  function hideKeyboard(immediate) {
+    cancelPendingKeyboardHide();
 
     const run = function () {
-      pendingKeyboardHide = false;
       const active = document.activeElement;
       if (active && typeof active.blur === "function") {
         active.blur();
@@ -359,13 +366,7 @@ button, input, textarea, select, a {
       return;
     }
 
-    pendingKeyboardHide = true;
     hideKeyboardTimer = setTimeout(run, 90);
-  }
-
-  function cancelPendingKeyboardHide() {
-    pendingKeyboardHide = false;
-    clearTimeout(hideKeyboardTimer);
   }
 
   function rememberScroll() {
@@ -373,7 +374,10 @@ button, input, textarea, select, a {
   }
 
   function restoreScroll() {
-    app.scrollTop = Math.max(0, lastKnownScrollTop);
+    const targetTop = Math.max(0, lastKnownScrollTop);
+    if (app.scrollTop !== targetTop) {
+      app.scrollTop = targetTop;
+    }
   }
 
   function getVisibleBottom() {
@@ -429,14 +433,17 @@ button, input, textarea, select, a {
     blurTimer = setTimeout(() => {
       updateAppHeight();
       restoreScroll();
+
       requestAnimationFrame(() => {
         updateAppHeight();
         restoreScroll();
       });
+
       setTimeout(() => {
         updateAppHeight();
         restoreScroll();
       }, 120);
+
       setTimeout(() => {
         updateAppHeight();
         restoreScroll();
@@ -464,8 +471,12 @@ button, input, textarea, select, a {
     }, 16);
   }
 
+  function isInteractiveElement(target) {
+    return !!(target && target.closest("input, button, textarea, select, label, a"));
+  }
+
   function handleOutsidePointer(event) {
-    if (event.target.closest("input, button, textarea, select, label")) {
+    if (isInteractiveElement(event.target)) {
       return;
     }
 
@@ -558,8 +569,8 @@ button, input, textarea, select, a {
 
   if (tg) {
     try {
-      window.Telegram.WebApp.ready();
-      window.Telegram.WebApp.expand();
+      tg.ready();
+      tg.expand();
       if (typeof tg.disableVerticalSwipes === "function") {
         tg.disableVerticalSwipes();
       }
