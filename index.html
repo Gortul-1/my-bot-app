@@ -32,16 +32,23 @@ body {
 }
 
 #app {
-  height: 100dvh;
+  position: fixed;
+  inset: 0;
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   background: #f6f6f6;
-  transition: height 0.22s ease;
 }
 
 #content {
-  transition: min-height 0.22s ease, padding-bottom 0.22s ease;
+  min-height: 100%;
+  padding-bottom: 24px;
+  transition: padding-bottom 0.28s ease;
+  background: #f6f6f6;
+}
+
+#emailWrap {
+  transition: transform 0.28s ease;
 }
 
 * {
@@ -276,12 +283,13 @@ button, input, textarea, select, a {
   let selectedBank = "russian";
   let lastTouchEnd = 0;
   let focusTimer = null;
+  let blurTimer = null;
   let viewportRaf = null;
-  let lastKnownScrollTop = 0;
 
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   const app = document.getElementById("app");
   const content = document.getElementById("content");
+  const emailWrap = document.getElementById("emailWrap");
   const emailInput = document.getElementById("email");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
@@ -291,36 +299,21 @@ button, input, textarea, select, a {
     return document.activeElement === emailInput;
   }
 
-  function getViewportHeight() {
-    if (window.visualViewport && window.visualViewport.height) {
-      return Math.round(window.visualViewport.height);
-    }
-    return Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+  function getKeyboardInset() {
+    if (!window.visualViewport) return 0;
+
+    const vv = window.visualViewport;
+    const inset = Math.round(window.innerHeight - vv.height - vv.offsetTop);
+
+    return inset > 80 ? inset : 0;
   }
 
-  function updateAppHeight(smooth) {
-    const height = getViewportHeight();
-    if (!height || height < 1) return;
+  function applyKeyboardLayout() {
+    const keyboardInset = getKeyboardInset();
+    const opened = isKeyboardOpen() || keyboardInset > 0;
 
-    if (!smooth) {
-      app.style.transition = "none";
-      content.style.transition = "none";
-    } else {
-      app.style.transition = "height 0.22s ease";
-      content.style.transition = "min-height 0.22s ease, padding-bottom 0.22s ease";
-    }
-
-    document.documentElement.style.height = height + "px";
-    document.body.style.height = height + "px";
-    app.style.height = height + "px";
-    content.style.minHeight = height + "px";
-
-    if (!smooth) {
-      requestAnimationFrame(() => {
-        app.style.transition = "height 0.22s ease";
-        content.style.transition = "min-height 0.22s ease, padding-bottom 0.22s ease";
-      });
-    }
+    content.style.paddingBottom = (24 + keyboardInset) + "px";
+    emailWrap.style.transform = opened ? "translateY(-8px)" : "translateY(0)";
   }
 
   function updateBankButtons() {
@@ -367,33 +360,23 @@ button, input, textarea, select, a {
     }
   }
 
-  function rememberScroll() {
-    lastKnownScrollTop = app.scrollTop;
-  }
-
-  function getVisibleBottom() {
-    return getViewportHeight() - 12;
-  }
-
   function ensureInputVisible(behavior) {
-    const inputRect = emailInput.getBoundingClientRect();
-    const visibleTop = 10;
-    const visibleBottom = getVisibleBottom();
-    const extraBottomGap = 26;
+    const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+    const rect = emailWrap.getBoundingClientRect();
+    const safeTop = 12;
+    const safeBottom = vvHeight - 18;
 
-    if (inputRect.bottom > visibleBottom) {
-      const delta = inputRect.bottom - visibleBottom + extraBottomGap;
+    if (rect.bottom > safeBottom) {
       app.scrollTo({
-        top: app.scrollTop + delta,
+        top: app.scrollTop + (rect.bottom - safeBottom) + 14,
         behavior: behavior || "smooth"
       });
       return;
     }
 
-    if (inputRect.top < visibleTop) {
-      const delta = visibleTop - inputRect.top + 10;
+    if (rect.top < safeTop) {
       app.scrollTo({
-        top: Math.max(0, app.scrollTop - delta),
+        top: Math.max(0, app.scrollTop - (safeTop - rect.top) - 10),
         behavior: behavior || "smooth"
       });
     }
@@ -401,33 +384,41 @@ button, input, textarea, select, a {
 
   function scheduleEnsureVisible() {
     clearTimeout(focusTimer);
-    focusTimer = setTimeout(() => {
-      updateAppHeight(true);
+    focusTimer = setTimeout(function () {
+      applyKeyboardLayout();
       ensureInputVisible("smooth");
       setTimeout(() => ensureInputVisible("smooth"), 120);
-      setTimeout(() => ensureInputVisible("smooth"), 260);
-      setTimeout(() => ensureInputVisible("smooth"), 420);
-    }, 60);
+      setTimeout(() => ensureInputVisible("smooth"), 240);
+      setTimeout(() => ensureInputVisible("smooth"), 380);
+    }, 40);
   }
 
   function handleFocus() {
-    rememberScroll();
-    updateAppHeight(true);
+    clearTimeout(blurTimer);
+    applyKeyboardLayout();
     scheduleEnsureVisible();
   }
 
   function handleBlur() {
-    updateAppHeight(true);
+    clearTimeout(blurTimer);
+    blurTimer = setTimeout(function () {
+      applyKeyboardLayout();
+      emailWrap.style.transform = "translateY(0)";
+      content.style.paddingBottom = "24px";
+    }, 120);
   }
 
   function syncViewportSmooth() {
     if (viewportRaf) cancelAnimationFrame(viewportRaf);
 
-    viewportRaf = requestAnimationFrame(() => {
-      updateAppHeight(true);
+    viewportRaf = requestAnimationFrame(function () {
+      applyKeyboardLayout();
 
       if (isKeyboardOpen()) {
         ensureInputVisible("auto");
+      } else if (getKeyboardInset() === 0) {
+        content.style.paddingBottom = "24px";
+        emailWrap.style.transform = "translateY(0)";
       }
     });
   }
@@ -478,8 +469,6 @@ button, input, textarea, select, a {
     e.stopPropagation();
   }, { passive: true });
 
-  app.addEventListener("scroll", rememberScroll, { passive: true });
-
   document.addEventListener("click", handleOutsidePointer, { passive: true });
   document.addEventListener("touchstart", handleOutsidePointer, { passive: true });
 
@@ -503,22 +492,22 @@ button, input, textarea, select, a {
   }
 
   window.addEventListener("orientationchange", function () {
-    setTimeout(() => {
-      updateAppHeight(true);
-      if (document.activeElement === emailInput) {
+    setTimeout(function () {
+      applyKeyboardLayout();
+      if (isKeyboardOpen()) {
         ensureInputVisible("auto");
       }
     }, 250);
   });
 
   window.addEventListener("resize", function () {
-    updateAppHeight(true);
-    if (document.activeElement === emailInput) {
+    applyKeyboardLayout();
+    if (isKeyboardOpen()) {
       ensureInputVisible("auto");
     }
   });
 
-  updateAppHeight(false);
+  applyKeyboardLayout();
   updateBankButtons();
 
   if (tg) {
