@@ -26,6 +26,20 @@ html, body {
 body {
   font-family: Inter, sans-serif;
   background: #f6f6f6;
+  position: fixed;
+  inset: 0;
+}
+
+#app {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: #f6f6f6;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* progress bar */
@@ -93,6 +107,7 @@ body {
   transition: all 0.25s ease;
   color: #9c9c9c;
   -webkit-tap-highlight-color: transparent;
+  border: none;
 }
 
 /* кнопка выбрана */
@@ -106,9 +121,11 @@ body {
   transition: all 0.25s ease;
   color: #000;
   -webkit-tap-highlight-color: transparent;
+  border: none;
 }
 
-.neu-active:active {
+.neu-active:active,
+.neu-button:active {
   transform: translateY(1px);
 }
 
@@ -116,168 +133,254 @@ body {
   border-radius: 54px;
   background: #fff;
   box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
-  font-size: 16px; /* важно для iOS, чтобы не было авто-зума на input */
+  font-size: 16px;
   outline: none;
   border: none;
 }
 
 button, input, textarea, select, a {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 </style>
 </head>
 
 <body>
 
-<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
+<div id="app">
+  <div class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
 
-  <!-- progress -->
-  <div class="px-8 mb-6">
-    <div class="progress-nav">
+    <!-- progress -->
+    <div class="px-8 mb-6">
+      <div class="progress-nav">
 
-      <div class="progress-active-line"></div>
+        <div class="progress-active-line"></div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check"></div>
+          </div>
+          <div class="text-black text-xs mt-2 font-medium">Выбор</div>
         </div>
-        <div class="text-black text-xs mt-2 font-medium">Выбор</div>
-      </div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check opacity-30"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check opacity-30"></div>
+          </div>
+          <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
         </div>
-        <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
-      </div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check opacity-30"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check opacity-30"></div>
+          </div>
+          <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
         </div>
-        <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
-      </div>
 
-    </div>
-  </div>
-
-  <!-- товар -->
-  <div class="flex flex-col px-[30px]">
-
-    <div class="text-[#646464] text-base opacity-80 mb-2">
-      Товар:
-    </div>
-
-    <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-      Доступ в закрытый<br>канал “Время бояться”
-    </div>
-
-    <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-      <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-
-      <div class="flex flex-col text-sm">
-        <div class="font-medium">Мета катакомбы</div>
-        <div class="text-[#8d8d8d] text-xs">
-          Название канала изменено на "Мета катакомбы"
-        </div>
       </div>
     </div>
 
-  </div>
+    <!-- товар -->
+    <div class="flex flex-col px-[30px]">
 
-  <!-- кнопки -->
-  <div class="px-[30px] mt-6">
+      <div class="text-[#646464] text-base opacity-80 mb-2">
+        Товар:
+      </div>
 
-    <div class="text-[#646464] text-base opacity-80 mb-4">
-      Способ оплаты
+      <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+        Доступ в закрытый<br>канал “Время бояться”
+      </div>
+
+      <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+        <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
+
+        <div class="flex flex-col text-sm">
+          <div class="font-medium">Мета катакомбы</div>
+          <div class="text-[#8d8d8d] text-xs">
+            Название канала изменено на "Мета катакомбы"
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="flex gap-[22px]">
+    <!-- кнопки -->
+    <div class="px-[30px] mt-6">
 
-      <button id="russian" onclick="selectBank('russian')" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-        Российский<br>банк
+      <div class="text-[#646464] text-base opacity-80 mb-4">
+        Способ оплаты
+      </div>
+
+      <div class="flex gap-[22px]">
+
+        <button id="russian" type="button" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+          Российский<br>банк
+        </button>
+
+        <button id="foreign" type="button" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+          Зарубежный<br>банк
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- email -->
+    <div class="px-[30px] mt-6" id="emailWrap">
+
+      <div class="text-[#646464] text-base opacity-80 mb-3">
+        Ваш E-mail для отправки чека
+      </div>
+
+      <input id="email" type="email" inputmode="email" autocomplete="email" class="w-full h-[30px] px-4 input-style"/>
+
+    </div>
+
+    <!-- цена -->
+    <div class="px-[30px] mt-6">
+
+      <div class="text-[#646464] text-[18px]">
+        к оплате
+      </div>
+
+      <div class="text-[30px] font-bold text-[#181818]">
+        1200 р
+      </div>
+
+    </div>
+
+    <!-- кнопка далее -->
+    <div class="flex items-center px-[30px] mt-6">
+
+      <button id="nextBtn" type="button" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
+        далее
       </button>
 
-      <button id="foreign" onclick="selectBank('foreign')" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-        Зарубежный<br>банк
-      </button>
+      <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
 
     </div>
 
   </div>
-
-  <!-- email -->
-  <div class="px-[30px] mt-6">
-
-    <div class="text-[#646464] text-base opacity-80 mb-3">
-      Ваш E-mail для отправки чека
-    </div>
-
-    <input id="email" type="email" class="w-full h-[30px] px-4 input-style"/>
-
-  </div>
-
-  <!-- цена -->
-  <div class="px-[30px] mt-6">
-
-    <div class="text-[#646464] text-[18px]">
-      к оплате
-    </div>
-
-    <div class="text-[30px] font-bold text-[#181818]">
-      1200 р
-    </div>
-
-  </div>
-
-  <!-- кнопка далее -->
-  <div class="flex items-center px-[30px] mt-6">
-
-    <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
-      далее
-    </button>
-
-    <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
-
-  </div>
-
 </div>
 
 <script>
 let selectedBank = "russian";
+let lastTouchEnd = 0;
+
+const tg = window.Telegram?.WebApp;
+const app = document.getElementById("app");
+const emailInput = document.getElementById("email");
+const emailWrap = document.getElementById("emailWrap");
+const russianBtn = document.getElementById("russian");
+const foreignBtn = document.getElementById("foreign");
+const nextBtn = document.getElementById("nextBtn");
 
 function selectBank(bank) {
   selectedBank = bank;
 
-  const russian = document.getElementById("russian");
-  const foreign = document.getElementById("foreign");
-
-  russian.classList.remove("neu-active");
-  foreign.classList.remove("neu-active");
-
-  russian.classList.add("neu-button");
-  foreign.classList.add("neu-button");
+  russianBtn.classList.remove("neu-active");
+  foreignBtn.classList.remove("neu-active");
+  russianBtn.classList.add("neu-button");
+  foreignBtn.classList.add("neu-button");
 
   if (bank === "russian") {
-    russian.classList.add("neu-active");
-    russian.classList.remove("neu-button");
+    russianBtn.classList.add("neu-active");
+    russianBtn.classList.remove("neu-button");
   } else {
-    foreign.classList.add("neu-active");
-    foreign.classList.remove("neu-button");
+    foreignBtn.classList.add("neu-active");
+    foreignBtn.classList.remove("neu-button");
   }
 }
 
 function nextStep() {
-  const email = document.getElementById("email").value;
+  const email = emailInput.value.trim();
 
-  Telegram.WebApp.sendData(JSON.stringify({
-    email: email,
-    bank: selectedBank
-  }));
+  if (tg && typeof tg.sendData === "function") {
+    tg.sendData(JSON.stringify({
+      email: email,
+      bank: selectedBank
+    }));
+  } else {
+    console.log({
+      email: email,
+      bank: selectedBank
+    });
+  }
 }
 
-/* Отключение double-tap zoom */
-let lastTouchEnd = 0;
+function hideKeyboard() {
+  const active = document.activeElement;
+  if (active && typeof active.blur === "function") {
+    active.blur();
+  }
+}
+
+function updateAppHeight() {
+  const viewportHeight = window.visualViewport
+    ? window.visualViewport.height
+    : window.innerHeight;
+
+  app.style.height = viewportHeight + "px";
+}
+
+function scrollEmailIntoView() {
+  setTimeout(() => {
+    emailWrap.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }, 250);
+}
+
+russianBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  selectBank("russian");
+}, { passive: false });
+
+foreignBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  selectBank("foreign");
+}, { passive: false });
+
+nextBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  e.stopPropagation();
+  nextStep();
+}, { passive: false });
+
+emailInput.addEventListener("focus", function () {
+  updateAppHeight();
+  scrollEmailIntoView();
+});
+
+emailInput.addEventListener("blur", function () {
+  setTimeout(() => {
+    updateAppHeight();
+  }, 120);
+});
+
+emailInput.addEventListener("click", function (e) {
+  e.stopPropagation();
+});
+
+emailInput.addEventListener("touchstart", function (e) {
+  e.stopPropagation();
+}, { passive: true });
+
+document.addEventListener("click", function (e) {
+  if (!e.target.closest("input, button, textarea, select, label")) {
+    hideKeyboard();
+  }
+}, { passive: true });
+
+document.addEventListener("touchstart", function (e) {
+  if (!e.target.closest("input, button, textarea, select, label")) {
+    hideKeyboard();
+  }
+}, { passive: true });
+
 document.addEventListener("touchend", function (event) {
   const now = Date.now();
   if (now - lastTouchEnd <= 300) {
@@ -286,15 +389,40 @@ document.addEventListener("touchend", function (event) {
   lastTouchEnd = now;
 }, { passive: false });
 
-/* Отключение pinch zoom на iOS */
-["gesturestart", "gesturechange", "gestureend"].forEach(eventName => {
+["gesturestart", "gesturechange", "gestureend"].forEach(function (eventName) {
   document.addEventListener(eventName, function (e) {
     e.preventDefault();
   }, { passive: false });
 });
 
-Telegram.WebApp.ready();
-Telegram.WebApp.expand();
+if (window.visualViewport) {
+  const handleViewportChange = () => {
+    updateAppHeight();
+  };
+
+  window.visualViewport.addEventListener("resize", handleViewportChange);
+  window.visualViewport.addEventListener("scroll", handleViewportChange);
+}
+
+window.addEventListener("orientationchange", function () {
+  setTimeout(updateAppHeight, 200);
+});
+
+window.addEventListener("resize", function () {
+  updateAppHeight();
+});
+
+updateAppHeight();
+selectBank("russian");
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+
+  if (typeof tg.disableVerticalSwipes === "function") {
+    tg.disableVerticalSwipes();
+  }
+}
 </script>
 
 </body>
