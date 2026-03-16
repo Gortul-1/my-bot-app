@@ -37,6 +37,11 @@ body {
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
   background: #f6f6f6;
+  transition: height 0.22s ease;
+}
+
+#content {
+  transition: min-height 0.22s ease, padding-bottom 0.22s ease;
 }
 
 * {
@@ -270,11 +275,8 @@ button, input, textarea, select, a {
 
   let selectedBank = "russian";
   let lastTouchEnd = 0;
-  let blurTimer = null;
   let focusTimer = null;
-  let viewportTimer = null;
-  let hideKeyboardTimer = null;
-  let lastViewportHeight = 0;
+  let viewportRaf = null;
   let lastKnownScrollTop = 0;
 
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
@@ -290,29 +292,35 @@ button, input, textarea, select, a {
   }
 
   function getViewportHeight() {
-    const vvHeight = window.visualViewport && window.visualViewport.height
-      ? Math.round(window.visualViewport.height)
-      : 0;
-
-    const innerHeight = Math.round(window.innerHeight || 0);
-    const docHeight = Math.round(document.documentElement.clientHeight || 0);
-
-    if (isKeyboardOpen()) {
-      return vvHeight || innerHeight || docHeight || 0;
+    if (window.visualViewport && window.visualViewport.height) {
+      return Math.round(window.visualViewport.height);
     }
-
-    return Math.max(vvHeight, innerHeight, docHeight, 0);
+    return Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
   }
 
-  function updateAppHeight() {
+  function updateAppHeight(smooth) {
     const height = getViewportHeight();
     if (!height || height < 1) return;
 
-    lastViewportHeight = height;
+    if (!smooth) {
+      app.style.transition = "none";
+      content.style.transition = "none";
+    } else {
+      app.style.transition = "height 0.22s ease";
+      content.style.transition = "min-height 0.22s ease, padding-bottom 0.22s ease";
+    }
+
     document.documentElement.style.height = height + "px";
     document.body.style.height = height + "px";
     app.style.height = height + "px";
     content.style.minHeight = height + "px";
+
+    if (!smooth) {
+      requestAnimationFrame(() => {
+        app.style.transition = "height 0.22s ease";
+        content.style.transition = "min-height 0.22s ease, padding-bottom 0.22s ease";
+      });
+    }
   }
 
   function updateBankButtons() {
@@ -359,37 +367,8 @@ button, input, textarea, select, a {
     }
   }
 
-  function cancelPendingKeyboardHide() {
-    clearTimeout(hideKeyboardTimer);
-  }
-
-  function hideKeyboard(immediate) {
-    cancelPendingKeyboardHide();
-
-    const run = function () {
-      const active = document.activeElement;
-      if (active && typeof active.blur === "function") {
-        active.blur();
-      }
-    };
-
-    if (immediate) {
-      run();
-      return;
-    }
-
-    hideKeyboardTimer = setTimeout(run, 90);
-  }
-
   function rememberScroll() {
     lastKnownScrollTop = app.scrollTop;
-  }
-
-  function restoreScroll() {
-    const targetTop = Math.max(0, lastKnownScrollTop);
-    if (app.scrollTop !== targetTop) {
-      app.scrollTop = targetTop;
-    }
   }
 
   function getVisibleBottom() {
@@ -422,80 +401,35 @@ button, input, textarea, select, a {
 
   function scheduleEnsureVisible() {
     clearTimeout(focusTimer);
-
     focusTimer = setTimeout(() => {
-      updateAppHeight();
+      updateAppHeight(true);
       ensureInputVisible("smooth");
       setTimeout(() => ensureInputVisible("smooth"), 120);
       setTimeout(() => ensureInputVisible("smooth"), 260);
       setTimeout(() => ensureInputVisible("smooth"), 420);
-      setTimeout(() => ensureInputVisible("smooth"), 650);
-    }, 80);
+    }, 60);
   }
 
   function handleFocus() {
-    cancelPendingKeyboardHide();
     rememberScroll();
-    updateAppHeight();
+    updateAppHeight(true);
     scheduleEnsureVisible();
   }
 
   function handleBlur() {
-    clearTimeout(blurTimer);
-    blurTimer = setTimeout(() => {
-      updateAppHeight();
-      restoreScroll();
-
-      requestAnimationFrame(() => {
-        updateAppHeight();
-        restoreScroll();
-      });
-
-      setTimeout(() => {
-        updateAppHeight();
-        restoreScroll();
-      }, 120);
-
-      setTimeout(() => {
-        updateAppHeight();
-        restoreScroll();
-      }, 260);
-
-      setTimeout(() => {
-        updateAppHeight();
-        restoreScroll();
-      }, 420);
-    }, 180);
+    updateAppHeight(true);
   }
 
-  function handleViewportChange() {
-    clearTimeout(viewportTimer);
+  function syncViewportSmooth() {
+    if (viewportRaf) cancelAnimationFrame(viewportRaf);
 
-    viewportTimer = setTimeout(() => {
-      const newHeight = getViewportHeight();
-      const delta = Math.abs(newHeight - lastViewportHeight);
+    viewportRaf = requestAnimationFrame(() => {
+      updateAppHeight(true);
 
-      updateAppHeight();
-
-      if (document.activeElement === emailInput) {
-        if (delta > 10) {
-          ensureInputVisible("auto");
-          setTimeout(() => ensureInputVisible("auto"), 120);
-        }
-      } else {
-        restoreScroll();
-
-        requestAnimationFrame(() => {
-          updateAppHeight();
-          restoreScroll();
-        });
-
-        setTimeout(() => {
-          updateAppHeight();
-          restoreScroll();
-        }, 120);
+      if (isKeyboardOpen()) {
+        ensureInputVisible("auto");
       }
-    }, 16);
+    });
   }
 
   function isInteractiveElement(target) {
@@ -508,14 +442,13 @@ button, input, textarea, select, a {
     }
 
     if (document.activeElement === emailInput) {
-      hideKeyboard(false);
+      emailInput.blur();
     }
   }
 
   russianBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    cancelPendingKeyboardHide();
     selectBank("russian");
     sendHaptic();
   }, { passive: false });
@@ -523,7 +456,6 @@ button, input, textarea, select, a {
   foreignBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    cancelPendingKeyboardHide();
     selectBank("foreign");
     sendHaptic();
   }, { passive: false });
@@ -531,7 +463,6 @@ button, input, textarea, select, a {
   nextBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
-    cancelPendingKeyboardHide();
     sendHaptic();
     nextStep();
   }, { passive: false });
@@ -540,12 +471,10 @@ button, input, textarea, select, a {
   emailInput.addEventListener("blur", handleBlur);
 
   emailInput.addEventListener("click", function (e) {
-    cancelPendingKeyboardHide();
     e.stopPropagation();
   });
 
   emailInput.addEventListener("touchstart", function (e) {
-    cancelPendingKeyboardHide();
     e.stopPropagation();
   }, { passive: true });
 
@@ -569,29 +498,27 @@ button, input, textarea, select, a {
   });
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", handleViewportChange);
-    window.visualViewport.addEventListener("scroll", handleViewportChange);
+    window.visualViewport.addEventListener("resize", syncViewportSmooth);
+    window.visualViewport.addEventListener("scroll", syncViewportSmooth);
   }
 
   window.addEventListener("orientationchange", function () {
     setTimeout(() => {
-      updateAppHeight();
+      updateAppHeight(true);
       if (document.activeElement === emailInput) {
         ensureInputVisible("auto");
-      } else {
-        restoreScroll();
       }
     }, 250);
   });
 
   window.addEventListener("resize", function () {
-    updateAppHeight();
-    if (document.activeElement !== emailInput) {
-      restoreScroll();
+    updateAppHeight(true);
+    if (document.activeElement === emailInput) {
+      ensureInputVisible("auto");
     }
   });
 
-  updateAppHeight();
+  updateAppHeight(false);
   updateBankButtons();
 
   if (tg) {
