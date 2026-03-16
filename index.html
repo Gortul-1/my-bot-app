@@ -6,401 +6,643 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
-  <title>Mini App</title>
+  <title>VK Mini App</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: #f6f6f6;
-      overflow: hidden;
-      -webkit-text-size-adjust: 100%;
-      overscroll-behavior: none;
-      touch-action: manipulation;
-    }
-
-    body {
-      font-family: Inter, sans-serif;
-      position: fixed;
-      inset: 0;
-    }
-
-    #app {
-      height: 100dvh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    :root {
+      --bg: #f6f6f6;
+      --card: #ffffff;
+      --text: #181818;
+      --muted: #7a7a7a;
+      --line: #dcdcdc;
+      --accent: #0077ff;
+      --accent-dark: #005ed1;
+      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+      --shadow-strong: 0 14px 28px rgba(0, 0, 0, 0.16);
+      --radius-xl: 24px;
+      --radius-pill: 999px;
     }
 
     * {
       box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* progress bar */
-    .progress-nav {
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+    }
+
+    body {
+      overflow-x: hidden;
+    }
+
+    .app {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
+      gap: 20px;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .topbar-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .topbar-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .icon-btn {
+      border: none;
+      background: var(--card);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      box-shadow: var(--shadow-soft);
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .progress {
       position: relative;
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      width: 100%;
-      max-width: 280px;
+      max-width: 320px;
       margin: 0 auto;
     }
 
-    .progress-nav::before {
-      content: '';
+    .progress::before {
+      content: "";
       position: absolute;
       top: 14px;
-      left: 14px;
-      right: 14px;
+      left: 18px;
+      right: 18px;
       height: 2px;
-      background: #dcdcdc;
+      background: var(--line);
       z-index: 1;
     }
 
-    .progress-active-line {
+    .progress-line {
       position: absolute;
       top: 14px;
-      left: 14px;
-      width: calc(50% - 14px);
+      left: 18px;
+      width: calc(50% - 18px);
       height: 2px;
-      background: #bdbdbd;
+      background: var(--accent);
       z-index: 1;
+      transition: width 0.25s ease;
     }
 
-    .progress-circle {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
-      flex-shrink: 0;
+    .step {
       position: relative;
       z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 88px;
+      text-align: center;
     }
 
-    .progress-check {
-      width: 10px;
-      height: 6px;
-      border-left: 2px solid #2b2b2b;
-      border-bottom: 2px solid #2b2b2b;
-      transform: rotate(-45deg);
-      margin-top: -2px;
-    }
-
-    .neu-button {
-      border-radius: 49px;
-      background: #f2f2f2;
-      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.12);
+    .step-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      display: grid;
+      place-items: center;
+      box-shadow: var(--shadow-soft);
+      font-size: 14px;
+      font-weight: 700;
+      color: #a5a5a5;
       transition: all 0.25s ease;
-      color: #9c9c9c;
-      -webkit-tap-highlight-color: transparent;
-      border: none;
     }
 
-    .neu-active {
-      border-radius: 49px;
-      background: #f5f5f5;
+    .step.active .step-circle,
+    .step.done .step-circle {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .step-label {
+      font-size: 12px;
+      color: #9a9a9a;
+      font-weight: 600;
+    }
+
+    .step.active .step-label,
+    .step.done .step-label {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-soft);
+      padding: 18px;
+    }
+
+    .label {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .product-title {
+      margin: 0 0 14px;
+      font-size: 26px;
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .product-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #fafafa;
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+      flex-shrink: 0;
+    }
+
+    .product-name {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .product-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .bank-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .bank-btn {
+      min-height: 82px;
+      border: none;
+      border-radius: 26px;
+      background: #f1f1f1;
+      color: #8c8c8c;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
+      padding: 10px;
+    }
+
+    .bank-btn.active {
+      background: #fff;
+      color: var(--text);
+      box-shadow: var(--shadow-strong);
+      transform: translateY(-1px);
+    }
+
+    .input {
+      width: 100%;
+      min-height: 48px;
+      border: none;
+      outline: none;
+      border-radius: var(--radius-pill);
+      background: #fff;
       box-shadow:
-        0px 8px 18px rgba(0,0,0,0.30),
-        0px 25px 60px rgba(0,0,0,0.20);
-      transition: all 0.25s ease;
-      color: #000;
-      -webkit-tap-highlight-color: transparent;
-      border: none;
+        inset 0 3px 6px rgba(0,0,0,0.12),
+        0 4px 8px rgba(0,0,0,0.06);
+      padding: 0 16px;
+      font-size: 16px;
     }
 
-    .neu-active:active,
-    .neu-button:active {
+    .input.error {
+      box-shadow:
+        inset 0 3px 6px rgba(180,0,0,0.14),
+        0 0 0 2px rgba(255, 59, 48, 0.22);
+    }
+
+    .error-text {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #d70015;
+      display: none;
+    }
+
+    .error-text.show {
+      display: block;
+    }
+
+    .summary {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .price-label {
+      font-size: 16px;
+      color: var(--muted);
+    }
+
+    .price-value {
+      font-size: 34px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .status {
+      font-size: 13px;
+      color: var(--muted);
+      min-height: 18px;
+    }
+
+    .footer {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .continue-btn {
+      border: none;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      min-height: 56px;
+      padding: 0 26px;
+      font-size: 22px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow-strong);
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .continue-btn:active {
       transform: translateY(1px);
     }
 
-    .input-style {
-      border-radius: 54px;
-      background: #fff;
-      box-shadow:
-        inset 0px 4.9px 4.9px rgba(0,0,0,0.22),
-        0px 4.9px 4.9px rgba(0,0,0,0.10);
-      font-size: 16px; /* чтобы iOS/Telegram не зумил */
-      line-height: 16px;
-      outline: none;
-      border: none;
-      min-height: 44px;
-      width: 100%;
-      appearance: none;
-      -webkit-appearance: none;
+    .continue-btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
     }
 
-    button, input, textarea, select, a, div {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .bottom-line {
+    .footer-line {
       height: 2px;
-      background: #d1d5db;
-      flex-grow: 1;
-      margin-right: -30px;
+      background: #d9d9d9;
+      flex: 1;
+      border-radius: 999px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 420px) {
+      .bank-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .product-title {
+        font-size: 22px;
+      }
+
+      .continue-btn {
+        font-size: 20px;
+        width: 100%;
+      }
+
+      .footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .footer-line {
+        display: none;
+      }
     }
   </style>
 </head>
-
 <body>
-  <div id="app" class="bg-[#f6f6f6]">
-    <div class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px]">
-      <!-- progress -->
-      <div class="px-8 mb-6">
-        <div class="progress-nav">
-          <div class="progress-active-line"></div>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div>
+        <h1 class="topbar-title">Оплата доступа</h1>
+        <p class="topbar-subtitle">VK Mini App interface</p>
+      </div>
+      <button class="icon-btn" id="closeBtn" aria-label="Закрыть">✕</button>
+    </header>
 
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check"></div>
-            </div>
-            <div class="text-black text-xs mt-2 font-medium">Выбор</div>
-          </div>
+    <section class="progress" aria-label="Прогресс оформления">
+      <div class="progress-line" id="progressLine"></div>
 
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
-            </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
-          </div>
-
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
-            </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
-          </div>
-        </div>
+      <div class="step done">
+        <div class="step-circle">✓</div>
+        <div class="step-label">Выбор</div>
       </div>
 
-      <!-- товар -->
-      <div class="flex flex-col px-[30px]">
-        <div class="text-[#646464] text-base opacity-80 mb-2">
-          Товар:
-        </div>
-
-        <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-          Доступ в закрытый<br>канал “Время бояться”
-        </div>
-
-        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-          <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-
-          <div class="flex flex-col text-sm">
-            <div class="font-medium">Мета катакомбы</div>
-            <div class="text-[#8d8d8d] text-xs">
-              Название канала изменено на "Мета катакомбы"
-            </div>
-          </div>
-        </div>
+      <div class="step active">
+        <div class="step-circle">2</div>
+        <div class="step-label">Данные</div>
       </div>
 
-      <!-- кнопки -->
-      <div class="px-[30px] mt-6">
-        <div class="text-[#646464] text-base opacity-80 mb-4">
-          Способ оплаты
-        </div>
+      <div class="step">
+        <div class="step-circle">3</div>
+        <div class="step-label">Оплата</div>
+      </div>
+    </section>
 
-        <div class="flex gap-[22px]">
-          <button
-            id="russian"
-            type="button"
-            class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]"
-          >
-            Российский<br>банк
-          </button>
+    <section class="card">
+      <div class="label">Товар</div>
+      <h2 class="product-title">Доступ в закрытый канал “Время бояться”</h2>
 
-          <button
-            id="foreign"
-            type="button"
-            class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]"
-          >
-            Зарубежный<br>банк
-          </button>
+      <div class="product-row">
+        <div class="avatar"></div>
+        <div>
+          <div class="product-name">Мета катакомбы</div>
+          <div class="product-desc">Название канала изменено на “Мета катакомбы”</div>
         </div>
       </div>
+    </section>
 
-      <!-- email -->
-      <div class="px-[30px] mt-6" id="emailBlock">
-        <div class="text-[#646464] text-base opacity-80 mb-3">
-          Ваш E-mail для отправки чека
-        </div>
+    <section class="card">
+      <div class="label">Способ оплаты</div>
 
-        <input
-          id="email"
-          type="email"
-          inputmode="email"
-          autocomplete="email"
-          class="px-4 input-style"
-        />
-      </div>
-
-      <!-- цена -->
-      <div class="px-[30px] mt-6">
-        <div class="text-[#646464] text-[18px]">
-          к оплате
-        </div>
-
-        <div class="text-[30px] font-bold text-[#181818]">
-          1200 р
-        </div>
-      </div>
-
-      <!-- кнопка далее -->
-      <div class="flex items-center px-[30px] mt-6 pb-[16px]">
-        <button
-          id="nextBtn"
-          type="button"
-          class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg border-0"
-        >
-          далее
+      <div class="bank-grid">
+        <button class="bank-btn active" data-bank="russian" type="button">
+          Российский<br />банк
         </button>
-
-        <div class="bottom-line"></div>
+        <button class="bank-btn" data-bank="foreign" type="button">
+          Зарубежный<br />банк
+        </button>
       </div>
-    </div>
+    </section>
+
+    <section class="card" id="emailBlock">
+      <div class="label">Ваш E-mail для отправки чека</div>
+      <input
+        id="email"
+        class="input"
+        type="email"
+        inputmode="email"
+        autocomplete="email"
+        placeholder="name@example.com"
+      />
+      <div class="error-text" id="emailError">Введите корректный e-mail.</div>
+    </section>
+
+    <section class="card summary">
+      <div>
+        <div class="price-label">К оплате</div>
+        <div class="price-value">1200 ₽</div>
+      </div>
+      <div class="status" id="statusText">Готово к отправке</div>
+    </section>
+
+    <footer class="footer">
+      <button class="continue-btn" id="nextBtn" type="button">далее</button>
+      <div class="footer-line"></div>
+    </footer>
   </div>
 
   <script>
-    const tg = window.Telegram?.WebApp;
-    const app = document.getElementById("app");
-    const emailInput = document.getElementById("email");
-    const emailBlock = document.getElementById("emailBlock");
-    const russianBtn = document.getElementById("russian");
-    const foreignBtn = document.getElementById("foreign");
-    const nextBtn = document.getElementById("nextBtn");
+    const state = {
+      bank: 'russian',
+      email: '',
+      user: null,
+      appId: null,
+    };
 
-    let selectedBank = "russian";
-    let lastTouchEnd = 0;
+    const elements = {
+      app: document.getElementById('app'),
+      email: document.getElementById('email'),
+      emailBlock: document.getElementById('emailBlock'),
+      emailError: document.getElementById('emailError'),
+      nextBtn: document.getElementById('nextBtn'),
+      closeBtn: document.getElementById('closeBtn'),
+      statusText: document.getElementById('statusText'),
+      bankButtons: Array.from(document.querySelectorAll('.bank-btn')),
+    };
+
+    function setStatus(text) {
+      elements.statusText.textContent = text;
+    }
 
     function updateBankButtons() {
-      russianBtn.classList.remove("neu-active", "neu-button");
-      foreignBtn.classList.remove("neu-active", "neu-button");
+      elements.bankButtons.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.bank === state.bank);
+      });
+    }
 
-      if (selectedBank === "russian") {
-        russianBtn.classList.add("neu-active");
-        foreignBtn.classList.add("neu-button");
-      } else {
-        foreignBtn.classList.add("neu-active");
-        russianBtn.classList.add("neu-button");
+    function validateEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+    }
+
+    function showEmailError(show) {
+      elements.email.classList.toggle('error', show);
+      elements.emailError.classList.toggle('show', show);
+    }
+
+    function blurActiveElement() {
+      const active = document.activeElement;
+      if (active && typeof active.blur === 'function') {
+        active.blur();
       }
     }
 
-    function selectBank(bank) {
-      selectedBank = bank;
-      updateBankButtons();
-    }
-
-    function nextStep() {
-      const email = emailInput.value.trim();
-
-      tg.sendData(JSON.stringify({
-        email,
-        bank: selectedBank
-      }));
-    }
-
-    function hideKeyboard() {
-      if (document.activeElement && typeof document.activeElement.blur === "function") {
-        document.activeElement.blur();
-      }
-    }
-
-    function scrollEmailIntoView() {
+    function scrollInputIntoView() {
       setTimeout(() => {
-        emailBlock.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
+        elements.emailBlock.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
         });
       }, 250);
     }
 
-    russianBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      selectBank("russian");
-    });
+    async function initVK() {
+      try {
+        await vkBridge.send('VKWebAppInit');
+        setStatus('VK Bridge инициализирован');
 
-    foreignBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      selectBank("foreign");
-    });
+        const launchParams = new URLSearchParams(window.location.search);
+        state.appId = launchParams.get('vk_app_id') || null;
 
-    nextBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      nextStep();
-    });
+        try {
+          const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
+          state.user = userInfo;
+          if (userInfo && userInfo.first_name) {
+            setStatus(`Здравствуйте, ${userInfo.first_name}`);
+          }
+        } catch (userError) {
+          setStatus('Приложение запущено');
+        }
 
-    emailInput.addEventListener("focus", () => {
-      scrollEmailIntoView();
-    });
-
-    emailInput.addEventListener("click", (e) => {
-      e.stopPropagation();
-    });
-
-    emailInput.addEventListener("touchstart", (e) => {
-      e.stopPropagation();
-    }, { passive: true });
-
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest("input, button, textarea, select, label")) {
-        hideKeyboard();
+        try {
+          await vkBridge.send('VKWebAppSetViewSettings', {
+            status_bar_style: 'dark',
+            action_bar_color: '#f6f6f6'
+          });
+        } catch (e) {
+          // Optional bridge call, safe to ignore
+        }
+      } catch (error) {
+        console.error('VK init error:', error);
+        setStatus('Ошибка инициализации VK Bridge');
       }
-    });
-
-    document.addEventListener("touchstart", (e) => {
-      if (!e.target.closest("input, button, textarea, select, label")) {
-        hideKeyboard();
-      }
-    }, { passive: true });
-
-    document.addEventListener("touchend", function (event) {
-      const now = Date.now();
-      if (now - lastTouchEnd <= 300) {
-        event.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, { passive: false });
-
-    ["gesturestart", "gesturechange", "gestureend"].forEach((eventName) => {
-      document.addEventListener(eventName, function (e) {
-        e.preventDefault();
-      }, { passive: false });
-    });
-
-    if (window.visualViewport) {
-      const handleViewport = () => {
-        const viewportHeight = window.visualViewport.height;
-        app.style.height = viewportHeight + "px";
-      };
-
-      window.visualViewport.addEventListener("resize", handleViewport);
-      window.visualViewport.addEventListener("scroll", handleViewport);
-      handleViewport();
     }
 
-    tg.ready();
-    tg.expand();
+    async function submitForm() {
+      const email = elements.email.value.trim();
+      state.email = email;
 
-    if (tg.disableVerticalSwipes) {
-      tg.disableVerticalSwipes();
+      if (!validateEmail(email)) {
+        showEmailError(true);
+        elements.email.focus();
+        scrollInputIntoView();
+        setStatus('Проверьте e-mail');
+        return;
+      }
+
+      showEmailError(false);
+      elements.nextBtn.disabled = true;
+      setStatus('Отправка данных...');
+
+      const payload = {
+        email: state.email,
+        bank: state.bank,
+        appId: state.appId,
+        userId: state.user?.id || null,
+        ts: Date.now()
+      };
+
+      try {
+        await vkBridge.send('VKWebAppShowAlert', {
+          message:
+            'Данные готовы к отправке:\n' +
+            `E-mail: ${payload.email}\n` +
+            `Банк: ${payload.bank === 'russian' ? 'Российский' : 'Зарубежный'}`
+        });
+
+        console.log('Form payload:', payload);
+        setStatus('Данные успешно подготовлены');
+      } catch (error) {
+        console.error('Submit error:', error);
+        setStatus('Не удалось отправить данные');
+      } finally {
+        elements.nextBtn.disabled = false;
+      }
+    }
+
+    function attachEvents() {
+      elements.bankButtons.forEach((btn) => {
+        btn.addEventListener('click', (event) => {
+          event.preventDefault();
+          state.bank = btn.dataset.bank;
+          updateBankButtons();
+        });
+      });
+
+      elements.email.addEventListener('focus', scrollInputIntoView);
+      elements.email.addEventListener('input', () => {
+        if (elements.email.value.trim() === '') {
+          showEmailError(false);
+          setStatus('Готово к отправке');
+          return;
+        }
+
+        if (validateEmail(elements.email.value)) {
+          showEmailError(false);
+          setStatus('E-mail корректный');
+        }
+      });
+
+      elements.nextBtn.addEventListener('click', submitForm);
+
+      elements.closeBtn.addEventListener('click', async () => {
+        try {
+          await vkBridge.send('VKWebAppClose', { status: 'success' });
+        } catch (error) {
+          window.close();
+        }
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!event.target.closest('input, button, textarea, select, label')) {
+          blurActiveElement();
+        }
+      });
+
+      document.addEventListener('touchstart', (event) => {
+        if (!event.target.closest('input, button, textarea, select, label')) {
+          blurActiveElement();
+        }
+      }, { passive: true });
+
+      let lastTouchEnd = 0;
+      document.addEventListener('touchend', (event) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+          event.preventDefault();
+        }
+        lastTouchEnd = now;
+      }, { passive: false });
+
+      ['gesturestart', 'gesturechange', 'gestureend'].forEach((eventName) => {
+        document.addEventListener(eventName, (event) => {
+          event.preventDefault();
+        }, { passive: false });
+      });
+
+      if (window.visualViewport) {
+        const updateViewportHeight = () => {
+          elements.app.style.minHeight = `${window.visualViewport.height}px`;
+        };
+
+        window.visualViewport.addEventListener('resize', updateViewportHeight);
+        window.visualViewport.addEventListener('scroll', updateViewportHeight);
+        updateViewportHeight();
+      }
     }
 
     updateBankButtons();
+    attachEvents();
+    initVK();
   </script>
 </body>
 </html>
