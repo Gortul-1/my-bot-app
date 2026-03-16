@@ -1,702 +1,301 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-  />
-  <title>Mini App</title>
+<meta charset="UTF-8">
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+/>
+<title>Mini App</title>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <style>
-    :root {
-      --bg: #f6f6f6;
-      --card: #ffffff;
-      --text: #181818;
-      --muted: #7a7a7a;
-      --line: #dcdcdc;
-      --accent: #1f1f1f;
-      --accent-dark: #111111;
-      --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
-      --shadow-strong: 0 14px 28px rgba(0, 0, 0, 0.16);
-      --radius-xl: 24px;
-      --radius-pill: 999px;
-    }
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
 
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+body {
+  font-family: Inter, sans-serif;
+  background: #f6f6f6;
+}
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Inter, Arial, sans-serif;
-      -webkit-text-size-adjust: 100%;
-      overscroll-behavior: none;
-      touch-action: manipulation;
-      overflow: hidden;
-    }
+/* progress bar */
 
-    body {
-      position: fixed;
-      inset: 0;
-    }
+.progress-nav {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 280px;
+  margin: 0 auto;
+}
 
-    #app {
-      height: 100dvh;
-      overflow-y: auto;
-      overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
-      padding-bottom: calc(24px + env(safe-area-inset-bottom));
-      background: var(--bg);
-    }
+.progress-nav::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #dcdcdc;
+  z-index: 1;
+}
 
-    .app {
-      min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      padding: 16px 20px calc(24px + env(safe-area-inset-bottom));
-      gap: 20px;
-      max-width: 540px;
-      margin: 0 auto;
-    }
+.progress-active-line {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: calc(50% - 14px);
+  height: 2px;
+  background: #bdbdbd;
+  z-index: 1;
+}
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
+.progress-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
 
-    .topbar-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin: 0;
-    }
+.progress-check {
+  width: 10px;
+  height: 6px;
+  border-left: 2px solid #2b2b2b;
+  border-bottom: 2px solid #2b2b2b;
+  transform: rotate(-45deg);
+  margin-top: -2px;
+}
 
-    .topbar-subtitle {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
+/* кнопка не выбрана */
 
-    .icon-btn {
-      border: none;
-      background: var(--card);
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      box-shadow: var(--shadow-soft);
-      cursor: pointer;
-      font-size: 18px;
-      transition: transform 0.2s ease;
-    }
+.neu-button {
+  border-radius: 49px;
+  background: #f2f2f2;
+  box-shadow: inset 2px 2px 4px rgba(0,0,0,0.12);
+  transition: all 0.25s ease;
+  color: #9c9c9c;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .icon-btn:active {
-      transform: translateY(1px);
-    }
+/* кнопка выбрана */
 
-    .progress {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      max-width: 320px;
-      margin: 0 auto;
-      width: 100%;
-    }
+.neu-active {
+  border-radius: 49px;
+  background: #f5f5f5;
+  box-shadow:
+    0px 8px 18px rgba(0,0,0,0.30),
+    0px 25px 60px rgba(0,0,0,0.20);
+  transition: all 0.25s ease;
+  color: #000;
+  -webkit-tap-highlight-color: transparent;
+}
 
-    .progress::before {
-      content: "";
-      position: absolute;
-      top: 14px;
-      left: 18px;
-      right: 18px;
-      height: 2px;
-      background: var(--line);
-      z-index: 1;
-    }
+.neu-active:active {
+  transform: translateY(1px);
+}
 
-    .progress-line {
-      position: absolute;
-      top: 14px;
-      left: 18px;
-      width: calc(50% - 18px);
-      height: 2px;
-      background: #bdbdbd;
-      z-index: 1;
-      transition: width 0.25s ease;
-    }
+.input-style {
+  border-radius: 54px;
+  background: #fff;
+  box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
+  font-size: 16px; /* важно для iOS, чтобы не было авто-зума на input */
+  outline: none;
+  border: none;
+}
 
-    .step {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      width: 88px;
-      text-align: center;
-    }
-
-    .step-circle {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: #fff;
-      display: grid;
-      place-items: center;
-      box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
-      font-size: 14px;
-      font-weight: 700;
-      color: #a5a5a5;
-      transition: all 0.25s ease;
-    }
-
-    .step.done .step-circle {
-      color: #fff;
-      background: var(--accent);
-    }
-
-    .step.active .step-circle {
-      color: #fff;
-      background: #bdbdbd;
-    }
-
-    .step-label {
-      font-size: 12px;
-      color: #9a9a9a;
-      font-weight: 600;
-    }
-
-    .step.active .step-label,
-    .step.done .step-label {
-      color: var(--text);
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow-soft);
-      padding: 18px;
-    }
-
-    .label {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    .product-title {
-      margin: 0 0 14px;
-      font-size: 26px;
-      line-height: 1.15;
-      font-weight: 800;
-    }
-
-    .product-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #fafafa;
-      border-radius: 18px;
-      padding: 12px;
-    }
-
-    .avatar {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      background: #7f1d1d;
-      flex-shrink: 0;
-    }
-
-    .product-name {
-      font-size: 15px;
-      font-weight: 700;
-      margin-bottom: 3px;
-    }
-
-    .product-desc {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .bank-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .bank-btn {
-      min-height: 82px;
-      border: none;
-      border-radius: 26px;
-      background: #f1f1f1;
-      color: #8c8c8c;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.25s ease;
-      box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
-      padding: 10px;
-    }
-
-    .bank-btn.active {
-      background: #f5f5f5;
-      color: var(--text);
-      box-shadow:
-        0px 8px 18px rgba(0,0,0,0.30),
-        0px 25px 60px rgba(0,0,0,0.20);
-      transform: translateY(-1px);
-    }
-
-    .bank-btn:active {
-      transform: translateY(1px);
-    }
-
-    .input {
-      width: 100%;
-      min-height: 48px;
-      border: none;
-      outline: none;
-      border-radius: var(--radius-pill);
-      background: #fff;
-      box-shadow:
-        inset 0 3px 6px rgba(0,0,0,0.12),
-        0 4px 8px rgba(0,0,0,0.06);
-      padding: 0 16px;
-      font-size: 16px;
-      line-height: 16px;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-
-    .input.error {
-      box-shadow:
-        inset 0 3px 6px rgba(180,0,0,0.14),
-        0 0 0 2px rgba(255, 59, 48, 0.22);
-    }
-
-    .error-text {
-      margin-top: 8px;
-      font-size: 12px;
-      color: #d70015;
-      display: none;
-    }
-
-    .error-text.show {
-      display: block;
-    }
-
-    .summary {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .price-label {
-      font-size: 16px;
-      color: var(--muted);
-    }
-
-    .price-value {
-      font-size: 34px;
-      font-weight: 800;
-      margin-top: 4px;
-    }
-
-    .status {
-      font-size: 13px;
-      color: var(--muted);
-      min-height: 18px;
-    }
-
-    .footer {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .continue-btn {
-      border: none;
-      background: var(--accent);
-      color: #fff;
-      border-radius: var(--radius-pill);
-      min-height: 56px;
-      padding: 0 26px;
-      font-size: 22px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: var(--shadow-strong);
-      transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .continue-btn:active {
-      transform: translateY(1px);
-    }
-
-    .continue-btn:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
-
-    .footer-line {
-      height: 2px;
-      background: #d9d9d9;
-      flex: 1;
-      border-radius: 999px;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    button, input, textarea, select, a, div {
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    @media (max-width: 420px) {
-      .bank-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .product-title {
-        font-size: 22px;
-      }
-
-      .continue-btn {
-        font-size: 20px;
-        width: 100%;
-      }
-
-      .footer {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .footer-line {
-        display: none;
-      }
-    }
-  </style>
+button, input, textarea, select, a {
+  touch-action: manipulation;
+}
+</style>
 </head>
+
 <body>
-  <div id="app">
-    <div class="app">
-      <header class="topbar">
-        <div>
-          <h1 class="topbar-title">Оплата доступа</h1>
-          <p class="topbar-subtitle">Telegram Mini App interface</p>
+
+<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
+
+  <!-- progress -->
+  <div class="px-8 mb-6">
+    <div class="progress-nav">
+
+      <div class="progress-active-line"></div>
+
+      <div class="flex flex-col items-center">
+        <div class="progress-circle">
+          <div class="progress-check"></div>
         </div>
-        <button class="icon-btn" id="closeBtn" aria-label="Закрыть">✕</button>
-      </header>
+        <div class="text-black text-xs mt-2 font-medium">Выбор</div>
+      </div>
 
-      <section class="progress" aria-label="Прогресс оформления">
-        <div class="progress-line" id="progressLine"></div>
-
-        <div class="step done">
-          <div class="step-circle">✓</div>
-          <div class="step-label">Выбор</div>
+      <div class="flex flex-col items-center">
+        <div class="progress-circle">
+          <div class="progress-check opacity-30"></div>
         </div>
+        <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
+      </div>
 
-        <div class="step active">
-          <div class="step-circle">2</div>
-          <div class="step-label">Данные</div>
+      <div class="flex flex-col items-center">
+        <div class="progress-circle">
+          <div class="progress-check opacity-30"></div>
         </div>
+        <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
+      </div>
 
-        <div class="step">
-          <div class="step-circle">3</div>
-          <div class="step-label">Оплата</div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="label">Товар</div>
-        <h2 class="product-title">Доступ в закрытый канал “Время бояться”</h2>
-
-        <div class="product-row">
-          <div class="avatar"></div>
-          <div>
-            <div class="product-name">Мета катакомбы</div>
-            <div class="product-desc">Название канала изменено на “Мета катакомбы”</div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="label">Способ оплаты</div>
-
-        <div class="bank-grid">
-          <button class="bank-btn active" data-bank="russian" type="button">
-            Российский<br />банк
-          </button>
-          <button class="bank-btn" data-bank="foreign" type="button">
-            Зарубежный<br />банк
-          </button>
-        </div>
-      </section>
-
-      <section class="card" id="emailBlock">
-        <div class="label">Ваш E-mail для отправки чека</div>
-        <input
-          id="email"
-          class="input"
-          type="email"
-          inputmode="email"
-          autocomplete="email"
-          placeholder="name@example.com"
-        />
-        <div class="error-text" id="emailError">Введите корректный e-mail.</div>
-      </section>
-
-      <section class="card summary">
-        <div>
-          <div class="price-label">К оплате</div>
-          <div class="price-value">1200 ₽</div>
-        </div>
-        <div class="status" id="statusText">Готово к отправке</div>
-      </section>
-
-      <footer class="footer">
-        <button class="continue-btn" id="nextBtn" type="button">далее</button>
-        <div class="footer-line"></div>
-      </footer>
     </div>
   </div>
 
-  <script>
-    const tg = window.Telegram?.WebApp;
-    const state = {
-      bank: "russian",
-      email: ""
-    };
+  <!-- товар -->
+  <div class="flex flex-col px-[30px]">
 
-    const elements = {
-      app: document.getElementById("app"),
-      email: document.getElementById("email"),
-      emailBlock: document.getElementById("emailBlock"),
-      emailError: document.getElementById("emailError"),
-      nextBtn: document.getElementById("nextBtn"),
-      closeBtn: document.getElementById("closeBtn"),
-      statusText: document.getElementById("statusText"),
-      bankButtons: Array.from(document.querySelectorAll(".bank-btn"))
-    };
+    <div class="text-[#646464] text-base opacity-80 mb-2">
+      Товар:
+    </div>
 
-    let lastTouchEnd = 0;
+    <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+      Доступ в закрытый<br>канал “Время бояться”
+    </div>
 
-    function setStatus(text) {
-      elements.statusText.textContent = text;
-    }
+    <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+      <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
 
-    function updateBankButtons() {
-      elements.bankButtons.forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.bank === state.bank);
-      });
-    }
+      <div class="flex flex-col text-sm">
+        <div class="font-medium">Мета катакомбы</div>
+        <div class="text-[#8d8d8d] text-xs">
+          Название канала изменено на "Мета катакомбы"
+        </div>
+      </div>
+    </div>
 
-    function validateEmail(value) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
-    }
+  </div>
 
-    function showEmailError(show) {
-      elements.email.classList.toggle("error", show);
-      elements.emailError.classList.toggle("show", show);
-    }
+  <!-- кнопки -->
+  <div class="px-[30px] mt-6">
 
-    function blurActiveElement() {
-      const active = document.activeElement;
-      if (active && typeof active.blur === "function") {
-        active.blur();
-      }
-    }
+    <div class="text-[#646464] text-base opacity-80 mb-4">
+      Способ оплаты
+    </div>
 
-    function scrollInputIntoView() {
-      setTimeout(() => {
-        elements.emailBlock.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
-      }, 250);
-    }
+    <div class="flex gap-[22px]">
 
-    function selectBank(bank) {
-      state.bank = bank;
-      updateBankButtons();
-      setStatus("Готово к отправке");
-    }
+      <button id="russian" onclick="selectBank('russian')" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+        Российский<br>банк
+      </button>
 
-    function nextStep() {
-      const email = elements.email.value.trim();
-      state.email = email;
+      <button id="foreign" onclick="selectBank('foreign')" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+        Зарубежный<br>банк
+      </button>
 
-      if (!validateEmail(email)) {
-        showEmailError(true);
-        elements.email.focus();
-        scrollInputIntoView();
-        setStatus("Проверьте e-mail");
-        return;
-      }
+    </div>
 
-      showEmailError(false);
-      elements.nextBtn.disabled = true;
-      setStatus("Отправка данных...");
+  </div>
 
-      const payload = {
-        email: state.email,
-        bank: state.bank
-      };
+  <!-- email -->
+  <div class="px-[30px] mt-6">
 
-      try {
-        if (tg && typeof tg.sendData === "function") {
-          tg.sendData(JSON.stringify(payload));
-          setStatus("Данные отправлены");
-        } else {
-          console.log("Telegram payload:", payload);
-          setStatus("Данные готовы");
-        }
-      } catch (error) {
-        console.error("Send error:", error);
-        setStatus("Не удалось отправить данные");
-      } finally {
-        setTimeout(() => {
-          elements.nextBtn.disabled = false;
-        }, 250);
-      }
-    }
+    <div class="text-[#646464] text-base opacity-80 mb-3">
+      Ваш E-mail для отправки чека
+    </div>
 
-    function attachEvents() {
-      elements.bankButtons.forEach((btn) => {
-        btn.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          selectBank(btn.dataset.bank);
-        });
-      });
+    <input id="email" type="email" class="w-full h-[30px] px-4 input-style"/>
 
-      elements.email.addEventListener("focus", scrollInputIntoView);
+  </div>
 
-      elements.email.addEventListener("input", () => {
-        const value = elements.email.value.trim();
+  <!-- цена -->
+  <div class="px-[30px] mt-6">
 
-        if (value === "") {
-          showEmailError(false);
-          setStatus("Готово к отправке");
-          return;
-        }
+    <div class="text-[#646464] text-[18px]">
+      к оплате
+    </div>
 
-        if (validateEmail(value)) {
-          showEmailError(false);
-          setStatus("E-mail корректный");
-        }
-      });
+    <div class="text-[30px] font-bold text-[#181818]">
+      1200 р
+    </div>
 
-      elements.email.addEventListener("click", (event) => {
-        event.stopPropagation();
-      });
+  </div>
 
-      elements.email.addEventListener("touchstart", (event) => {
-        event.stopPropagation();
-      }, { passive: true });
+  <!-- кнопка далее -->
+  <div class="flex items-center px-[30px] mt-6">
 
-      elements.nextBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        nextStep();
-      });
+    <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
+      далее
+    </button>
 
-      elements.closeBtn.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+    <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
 
-        blurActiveElement();
+  </div>
 
-        try {
-          if (tg && typeof tg.close === "function") {
-            tg.close();
-          } else {
-            window.close();
-          }
-        } catch (error) {
-          console.error("Close error:", error);
-        }
-      });
+</div>
 
-      document.addEventListener("click", (event) => {
-        if (!event.target.closest("input, button, textarea, select, label")) {
-          blurActiveElement();
-        }
-      });
+<script>
+let selectedBank = "russian";
 
-      document.addEventListener("touchstart", (event) => {
-        if (!event.target.closest("input, button, textarea, select, label")) {
-          blurActiveElement();
-        }
-      }, { passive: true });
+function selectBank(bank) {
+  selectedBank = bank;
 
-      document.addEventListener("touchend", (event) => {
-        const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
-          event.preventDefault();
-        }
-        lastTouchEnd = now;
-      }, { passive: false });
+  const russian = document.getElementById("russian");
+  const foreign = document.getElementById("foreign");
 
-      ["gesturestart", "gesturechange", "gestureend"].forEach((eventName) => {
-        document.addEventListener(eventName, (event) => {
-          event.preventDefault();
-        }, { passive: false });
-      });
+  russian.classList.remove("neu-active");
+  foreign.classList.remove("neu-active");
 
-      if (window.visualViewport) {
-        const handleViewport = () => {
-          const viewportHeight = window.visualViewport.height;
-          elements.app.style.height = viewportHeight + "px";
-        };
+  russian.classList.add("neu-button");
+  foreign.classList.add("neu-button");
 
-        window.visualViewport.addEventListener("resize", handleViewport);
-        window.visualViewport.addEventListener("scroll", handleViewport);
-        handleViewport();
-      }
-    }
+  if (bank === "russian") {
+    russian.classList.add("neu-active");
+    russian.classList.remove("neu-button");
+  } else {
+    foreign.classList.add("neu-active");
+    foreign.classList.remove("neu-button");
+  }
+}
 
-    function initTelegram() {
-      try {
-        if (!tg) {
-          setStatus("Режим предпросмотра");
-          return;
-        }
+function nextStep() {
+  const email = document.getElementById("email").value;
 
-        tg.ready();
-        tg.expand();
+  Telegram.WebApp.sendData(JSON.stringify({
+    email: email,
+    bank: selectedBank
+  }));
+}
 
-        if (typeof tg.disableVerticalSwipes === "function") {
-          tg.disableVerticalSwipes();
-        }
+/* Отключение double-tap zoom */
+let lastTouchEnd = 0;
+document.addEventListener("touchend", function (event) {
+  const now = Date.now();
+  if (now - lastTouchEnd <= 300) {
+    event.preventDefault();
+  }
+  lastTouchEnd = now;
+}, { passive: false });
 
-        setStatus("Готово к отправке");
-      } catch (error) {
-        console.error("Telegram init error:", error);
-        setStatus("Ошибка инициализации");
-      }
-    }
+/* Отключение pinch zoom на iOS */
+["gesturestart", "gesturechange", "gestureend"].forEach(eventName => {
+  document.addEventListener(eventName, function (e) {
+    e.preventDefault();
+  }, { passive: false });
+});
 
-    updateBankButtons();
-    attachEvents();
-    initTelegram();
-  </script>
+Telegram.WebApp.ready();
+Telegram.WebApp.expand();
+</script>
+
 </body>
 </html>
