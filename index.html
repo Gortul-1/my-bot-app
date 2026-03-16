@@ -148,7 +148,7 @@ button, input, textarea, select, a {
 <body>
 
 <div id="app">
-  <div class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
+  <div id="content" class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
 
     <!-- progress -->
     <div class="px-8 mb-6">
@@ -264,165 +264,208 @@ button, input, textarea, select, a {
 </div>
 
 <script>
-let selectedBank = "russian";
-let lastTouchEnd = 0;
+(function () {
+  "use strict";
 
-const tg = window.Telegram?.WebApp;
-const app = document.getElementById("app");
-const emailInput = document.getElementById("email");
-const emailWrap = document.getElementById("emailWrap");
-const russianBtn = document.getElementById("russian");
-const foreignBtn = document.getElementById("foreign");
-const nextBtn = document.getElementById("nextBtn");
+  let selectedBank = "russian";
+  let lastTouchEnd = 0;
+  let keyboardOpen = false;
+  let blurTimer = null;
+  let focusScrollTimer = null;
+  let lastViewportHeight = 0;
 
-function selectBank(bank) {
-  selectedBank = bank;
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+  const app = document.getElementById("app");
+  const content = document.getElementById("content");
+  const emailInput = document.getElementById("email");
+  const emailWrap = document.getElementById("emailWrap");
+  const russianBtn = document.getElementById("russian");
+  const foreignBtn = document.getElementById("foreign");
+  const nextBtn = document.getElementById("nextBtn");
 
-  russianBtn.classList.remove("neu-active");
-  foreignBtn.classList.remove("neu-active");
-  russianBtn.classList.add("neu-button");
-  foreignBtn.classList.add("neu-button");
-
-  if (bank === "russian") {
-    russianBtn.classList.add("neu-active");
-    russianBtn.classList.remove("neu-button");
-  } else {
-    foreignBtn.classList.add("neu-active");
-    foreignBtn.classList.remove("neu-button");
+  function getViewportHeight() {
+    if (window.visualViewport && window.visualViewport.height) {
+      return Math.round(window.visualViewport.height);
+    }
+    return window.innerHeight;
   }
-}
 
-function nextStep() {
-  const email = emailInput.value.trim();
+  function updateAppHeight() {
+    const height = getViewportHeight();
+    lastViewportHeight = height;
+    app.style.height = height + "px";
+    content.style.minHeight = height + "px";
+  }
 
-  if (tg && typeof tg.sendData === "function") {
-    tg.sendData(JSON.stringify({
+  function updateBankButtons() {
+    russianBtn.classList.remove("neu-active", "neu-button");
+    foreignBtn.classList.remove("neu-active", "neu-button");
+
+    if (selectedBank === "russian") {
+      russianBtn.classList.add("neu-active");
+      foreignBtn.classList.add("neu-button");
+    } else {
+      foreignBtn.classList.add("neu-active");
+      russianBtn.classList.add("neu-button");
+    }
+  }
+
+  function selectBank(bank) {
+    selectedBank = bank;
+    updateBankButtons();
+  }
+
+  function sendHaptic() {
+    if (!tg || !tg.HapticFeedback || typeof tg.HapticFeedback.impactOccurred !== "function") return;
+    try {
+      tg.HapticFeedback.impactOccurred("medium");
+    } catch (e) {}
+  }
+
+  function nextStep() {
+    const email = emailInput.value.trim();
+    const payload = {
       email: email,
       bank: selectedBank
-    }));
-  } else {
-    console.log({
-      email: email,
-      bank: selectedBank
-    });
+    };
+
+    if (tg && typeof tg.sendData === "function") {
+      tg.sendData(JSON.stringify(payload));
+    } else {
+      console.log(payload);
+    }
   }
-}
 
-function hideKeyboard() {
-  const active = document.activeElement;
-  if (active && typeof active.blur === "function") {
-    active.blur();
+  function hideKeyboard() {
+    const active = document.activeElement;
+    if (active && typeof active.blur === "function") {
+      active.blur();
+    }
   }
-}
 
-function updateAppHeight() {
-  const viewportHeight = window.visualViewport
-    ? window.visualViewport.height
-    : window.innerHeight;
+  function scrollEmailIntoView() {
+    clearTimeout(focusScrollTimer);
+    focusScrollTimer = setTimeout(() => {
+      emailWrap.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "nearest"
+      });
+    }, 260);
+  }
 
-  app.style.height = viewportHeight + "px";
-}
-
-function scrollEmailIntoView() {
-  setTimeout(() => {
-    emailWrap.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-  }, 250);
-}
-
-russianBtn.addEventListener("click", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-  selectBank("russian");
-}, { passive: false });
-
-foreignBtn.addEventListener("click", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-  selectBank("foreign");
-}, { passive: false });
-
-nextBtn.addEventListener("click", function (e) {
-  e.preventDefault();
-  e.stopPropagation();
-  nextStep();
-}, { passive: false });
-
-emailInput.addEventListener("focus", function () {
-  updateAppHeight();
-  scrollEmailIntoView();
-});
-
-emailInput.addEventListener("blur", function () {
-  setTimeout(() => {
+  function handleFocus() {
+    keyboardOpen = true;
     updateAppHeight();
-  }, 120);
-});
+    scrollEmailIntoView();
+  }
 
-emailInput.addEventListener("click", function (e) {
-  e.stopPropagation();
-});
+  function handleBlur() {
+    clearTimeout(blurTimer);
+    blurTimer = setTimeout(() => {
+      keyboardOpen = false;
+      updateAppHeight();
+    }, 180);
+  }
 
-emailInput.addEventListener("touchstart", function (e) {
-  e.stopPropagation();
-}, { passive: true });
+  function handleViewportChange() {
+    const newHeight = getViewportHeight();
+    const heightDelta = Math.abs(newHeight - lastViewportHeight);
 
-document.addEventListener("click", function (e) {
-  if (!e.target.closest("input, button, textarea, select, label")) {
+    updateAppHeight();
+
+    if (document.activeElement === emailInput) {
+      keyboardOpen = true;
+      if (heightDelta > 20) {
+        scrollEmailIntoView();
+      }
+    } else if (keyboardOpen && heightDelta > 20) {
+      keyboardOpen = false;
+    }
+  }
+
+  function handleOutsidePointer(event) {
+    if (event.target.closest("input, button, textarea, select, label")) {
+      return;
+    }
     hideKeyboard();
   }
-}, { passive: true });
 
-document.addEventListener("touchstart", function (e) {
-  if (!e.target.closest("input, button, textarea, select, label")) {
-    hideKeyboard();
-  }
-}, { passive: true });
-
-document.addEventListener("touchend", function (event) {
-  const now = Date.now();
-  if (now - lastTouchEnd <= 300) {
-    event.preventDefault();
-  }
-  lastTouchEnd = now;
-}, { passive: false });
-
-["gesturestart", "gesturechange", "gestureend"].forEach(function (eventName) {
-  document.addEventListener(eventName, function (e) {
+  russianBtn.addEventListener("click", function (e) {
     e.preventDefault();
+    e.stopPropagation();
+    selectBank("russian");
+    sendHaptic();
   }, { passive: false });
-});
 
-if (window.visualViewport) {
-  const handleViewportChange = () => {
-    updateAppHeight();
-  };
+  foreignBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    selectBank("foreign");
+    sendHaptic();
+  }, { passive: false });
 
-  window.visualViewport.addEventListener("resize", handleViewportChange);
-  window.visualViewport.addEventListener("scroll", handleViewportChange);
-}
+  nextBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    sendHaptic();
+    nextStep();
+  }, { passive: false });
 
-window.addEventListener("orientationchange", function () {
-  setTimeout(updateAppHeight, 200);
-});
+  emailInput.addEventListener("focus", handleFocus);
+  emailInput.addEventListener("blur", handleBlur);
 
-window.addEventListener("resize", function () {
-  updateAppHeight();
-});
+  emailInput.addEventListener("click", function (e) {
+    e.stopPropagation();
+  });
 
-updateAppHeight();
-selectBank("russian");
+  emailInput.addEventListener("touchstart", function (e) {
+    e.stopPropagation();
+  }, { passive: true });
 
-if (tg) {
-  tg.ready();
-  tg.expand();
+  document.addEventListener("click", handleOutsidePointer, { passive: true });
+  document.addEventListener("touchstart", handleOutsidePointer, { passive: true });
 
-  if (typeof tg.disableVerticalSwipes === "function") {
-    tg.disableVerticalSwipes();
+  document.addEventListener("touchend", function (event) {
+    const now = Date.now();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
+  ["gesturestart", "gesturechange", "gestureend"].forEach(function (eventName) {
+    document.addEventListener(eventName, function (e) {
+      e.preventDefault();
+    }, { passive: false });
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", handleViewportChange);
+    window.visualViewport.addEventListener("scroll", handleViewportChange);
   }
-}
+
+  window.addEventListener("orientationchange", function () {
+    setTimeout(updateAppHeight, 250);
+  });
+
+  window.addEventListener("resize", function () {
+    updateAppHeight();
+  });
+
+  updateAppHeight();
+  updateBankButtons();
+
+  if (tg) {
+    try {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+      if (typeof tg.disableVerticalSwipes === "function") {
+        tg.disableVerticalSwipes();
+      }
+    } catch (e) {}
+  }
+})();
 </script>
 
 </body>
