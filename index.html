@@ -285,11 +285,23 @@ button, input, textarea, select, a {
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
 
+  function isKeyboardOpen() {
+    return document.activeElement === emailInput;
+  }
+
   function getViewportHeight() {
-    if (window.visualViewport && window.visualViewport.height) {
-      return Math.round(window.visualViewport.height);
+    const vvHeight = window.visualViewport && window.visualViewport.height
+      ? Math.round(window.visualViewport.height)
+      : 0;
+
+    const innerHeight = Math.round(window.innerHeight || 0);
+    const docHeight = Math.round(document.documentElement.clientHeight || 0);
+
+    if (isKeyboardOpen()) {
+      return vvHeight || innerHeight || docHeight || 0;
     }
-    return Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+
+    return Math.max(vvHeight, innerHeight, docHeight, 0);
   }
 
   function updateAppHeight() {
@@ -448,6 +460,11 @@ button, input, textarea, select, a {
         updateAppHeight();
         restoreScroll();
       }, 260);
+
+      setTimeout(() => {
+        updateAppHeight();
+        restoreScroll();
+      }, 420);
     }, 180);
   }
 
@@ -467,6 +484,16 @@ button, input, textarea, select, a {
         }
       } else {
         restoreScroll();
+
+        requestAnimationFrame(() => {
+          updateAppHeight();
+          restoreScroll();
+        });
+
+        setTimeout(() => {
+          updateAppHeight();
+          restoreScroll();
+        }, 120);
       }
     }, 16);
   }
