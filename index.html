@@ -21,6 +21,7 @@ html, body {
   touch-action: manipulation;
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
+  background: #f6f6f6;
 }
 
 body {
@@ -294,8 +295,11 @@ button, input, textarea, select, a {
   function updateAppHeight() {
     const height = getViewportHeight();
     lastViewportHeight = height;
+
+    document.documentElement.style.height = height + "px";
+    document.body.style.height = height + "px";
     app.style.height = height + "px";
-    content.style.minHeight = Math.max(height, window.innerHeight) + "px";
+    content.style.minHeight = height + "px";
   }
 
   function updateBankButtons() {
@@ -404,6 +408,18 @@ button, input, textarea, select, a {
     blurTimer = setTimeout(() => {
       updateAppHeight();
       restoreScroll();
+      requestAnimationFrame(() => {
+        updateAppHeight();
+        restoreScroll();
+      });
+      setTimeout(() => {
+        updateAppHeight();
+        restoreScroll();
+      }, 120);
+      setTimeout(() => {
+        updateAppHeight();
+        restoreScroll();
+      }, 260);
     }, 180);
   }
 
@@ -421,6 +437,8 @@ button, input, textarea, select, a {
           ensureInputVisible("auto");
           setTimeout(() => ensureInputVisible("auto"), 120);
         }
+      } else {
+        restoreScroll();
       }
     }, 16);
   }
@@ -493,12 +511,17 @@ button, input, textarea, select, a {
       updateAppHeight();
       if (document.activeElement === emailInput) {
         ensureInputVisible("auto");
+      } else {
+        restoreScroll();
       }
     }, 250);
   });
 
   window.addEventListener("resize", function () {
     updateAppHeight();
+    if (document.activeElement !== emailInput) {
+      restoreScroll();
+    }
   });
 
   updateAppHeight();
