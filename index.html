@@ -325,6 +325,73 @@ function scrollEmailIntoView() {
   }, 250);
 }
 
+function triggerTelegramFeedback(message, callback) {
+  if (tg) {
+    try {
+      if (tg.HapticFeedback && typeof tg.HapticFeedback.impactOccurred === "function") {
+        tg.HapticFeedback.impactOccurred("medium");
+      }
+    } catch (e) {}
+
+    try {
+      if (typeof tg.showAlert === "function") {
+        tg.showAlert(message, callback);
+        return;
+      }
+    } catch (e) {}
+  }
+
+  if (typeof callback === "function") {
+    callback();
+  }
+}
+
+function attachTelegramActionHandlers() {
+  const russianBtn = document.getElementById("russian");
+  const foreignBtn = document.getElementById("foreign");
+  const nextBtn = document.querySelector('button[onclick="nextStep()"]');
+  const actionLinks = document.querySelectorAll("a");
+
+  if (russianBtn) {
+    russianBtn.onclick = null;
+    russianBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      selectBank("russian");
+      triggerTelegramFeedback("Выбран способ оплаты: Российский банк");
+    }, { passive: false });
+  }
+
+  if (foreignBtn) {
+    foreignBtn.onclick = null;
+    foreignBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      selectBank("foreign");
+      triggerTelegramFeedback("Выбран способ оплаты: Зарубежный банк");
+    }, { passive: false });
+  }
+
+  if (nextBtn) {
+    nextBtn.onclick = null;
+    nextBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      triggerTelegramFeedback("Кнопка «далее» нажата", function () {
+        nextStep();
+      });
+    }, { passive: false });
+  }
+
+  actionLinks.forEach((link) => {
+    link.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      triggerTelegramFeedback("Ссылка нажата");
+    }, { passive: false });
+  });
+}
+
 emailInput.addEventListener("focus", () => {
   updateAppHeight();
   scrollEmailIntoView();
@@ -347,9 +414,10 @@ emailInput.addEventListener("touchstart", (e) => {
 
 document.addEventListener("click", (e) => {
   if (!e.target.closest("input, button, textarea, select, label")) {
+    e.preventDefault();
     hideKeyboard();
   }
-});
+}, { passive: false });
 
 document.addEventListener("touchstart", (e) => {
   if (!e.target.closest("input, button, textarea, select, label")) {
@@ -383,10 +451,11 @@ if (window.visualViewport) {
 }
 
 updateAppHeight();
+attachTelegramActionHandlers();
 
 if (tg) {
-  tg.ready();
-  tg.expand();
+  window.Telegram.WebApp.ready();
+  window.Telegram.WebApp.expand();
 
   if (typeof tg.disableVerticalSwipes === "function") {
     tg.disableVerticalSwipes();
