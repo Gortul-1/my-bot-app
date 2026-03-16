@@ -6,9 +6,10 @@
     name="viewport"
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
-  <title>VK Mini App</title>
+  <title>Mini App</title>
 
-  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
     :root {
@@ -17,8 +18,8 @@
       --text: #181818;
       --muted: #7a7a7a;
       --line: #dcdcdc;
-      --accent: #0077ff;
-      --accent-dark: #005ed1;
+      --accent: #1f1f1f;
+      --accent-dark: #111111;
       --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
       --shadow-strong: 0 14px 28px rgba(0, 0, 0, 0.16);
       --radius-xl: 24px;
@@ -35,17 +36,28 @@
       margin: 0;
       padding: 0;
       width: 100%;
-      min-height: 100%;
+      height: 100%;
       background: var(--bg);
       color: var(--text);
       font-family: Inter, Arial, sans-serif;
       -webkit-text-size-adjust: 100%;
-      touch-action: manipulation;
       overscroll-behavior: none;
+      touch-action: manipulation;
+      overflow: hidden;
     }
 
     body {
+      position: fixed;
+      inset: 0;
+    }
+
+    #app {
+      height: 100dvh;
+      overflow-y: auto;
       overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom));
+      background: var(--bg);
     }
 
     .app {
@@ -86,6 +98,11 @@
       box-shadow: var(--shadow-soft);
       cursor: pointer;
       font-size: 18px;
+      transition: transform 0.2s ease;
+    }
+
+    .icon-btn:active {
+      transform: translateY(1px);
     }
 
     .progress {
@@ -95,6 +112,7 @@
       align-items: flex-start;
       max-width: 320px;
       margin: 0 auto;
+      width: 100%;
     }
 
     .progress::before {
@@ -114,7 +132,7 @@
       left: 18px;
       width: calc(50% - 18px);
       height: 2px;
-      background: var(--accent);
+      background: #bdbdbd;
       z-index: 1;
       transition: width 0.25s ease;
     }
@@ -137,17 +155,21 @@
       background: #fff;
       display: grid;
       place-items: center;
-      box-shadow: var(--shadow-soft);
+      box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
       font-size: 14px;
       font-weight: 700;
       color: #a5a5a5;
       transition: all 0.25s ease;
     }
 
-    .step.active .step-circle,
     .step.done .step-circle {
       color: #fff;
       background: var(--accent);
+    }
+
+    .step.active .step-circle {
+      color: #fff;
+      background: #bdbdbd;
     }
 
     .step-label {
@@ -194,7 +216,7 @@
       width: 48px;
       height: 48px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #8e2de2, #4a00e0);
+      background: #7f1d1d;
       flex-shrink: 0;
     }
 
@@ -225,16 +247,22 @@
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
-      transition: 0.2s ease;
+      transition: 0.25s ease;
       box-shadow: inset 2px 2px 4px rgba(0,0,0,0.08);
       padding: 10px;
     }
 
     .bank-btn.active {
-      background: #fff;
+      background: #f5f5f5;
       color: var(--text);
-      box-shadow: var(--shadow-strong);
+      box-shadow:
+        0px 8px 18px rgba(0,0,0,0.30),
+        0px 25px 60px rgba(0,0,0,0.20);
       transform: translateY(-1px);
+    }
+
+    .bank-btn:active {
+      transform: translateY(1px);
     }
 
     .input {
@@ -249,6 +277,9 @@
         0 4px 8px rgba(0,0,0,0.06);
       padding: 0 16px;
       font-size: 16px;
+      line-height: 16px;
+      appearance: none;
+      -webkit-appearance: none;
     }
 
     .input.error {
@@ -311,7 +342,7 @@
       font-weight: 800;
       cursor: pointer;
       box-shadow: var(--shadow-strong);
-      transition: background 0.2s ease, transform 0.2s ease;
+      transition: background 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     }
 
     .continue-btn:active {
@@ -332,6 +363,10 @@
 
     .hidden {
       display: none !important;
+    }
+
+    button, input, textarea, select, a, div {
+      -webkit-tap-highlight-color: transparent;
     }
 
     @media (max-width: 420px) {
@@ -360,105 +395,108 @@
   </style>
 </head>
 <body>
-  <div class="app" id="app">
-    <header class="topbar">
-      <div>
-        <h1 class="topbar-title">Оплата доступа</h1>
-        <p class="topbar-subtitle">VK Mini App interface</p>
-      </div>
-      <button class="icon-btn" id="closeBtn" aria-label="Закрыть">✕</button>
-    </header>
-
-    <section class="progress" aria-label="Прогресс оформления">
-      <div class="progress-line" id="progressLine"></div>
-
-      <div class="step done">
-        <div class="step-circle">✓</div>
-        <div class="step-label">Выбор</div>
-      </div>
-
-      <div class="step active">
-        <div class="step-circle">2</div>
-        <div class="step-label">Данные</div>
-      </div>
-
-      <div class="step">
-        <div class="step-circle">3</div>
-        <div class="step-label">Оплата</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="label">Товар</div>
-      <h2 class="product-title">Доступ в закрытый канал “Время бояться”</h2>
-
-      <div class="product-row">
-        <div class="avatar"></div>
+  <div id="app">
+    <div class="app">
+      <header class="topbar">
         <div>
-          <div class="product-name">Мета катакомбы</div>
-          <div class="product-desc">Название канала изменено на “Мета катакомбы”</div>
+          <h1 class="topbar-title">Оплата доступа</h1>
+          <p class="topbar-subtitle">Telegram Mini App interface</p>
         </div>
-      </div>
-    </section>
+        <button class="icon-btn" id="closeBtn" aria-label="Закрыть">✕</button>
+      </header>
 
-    <section class="card">
-      <div class="label">Способ оплаты</div>
+      <section class="progress" aria-label="Прогресс оформления">
+        <div class="progress-line" id="progressLine"></div>
 
-      <div class="bank-grid">
-        <button class="bank-btn active" data-bank="russian" type="button">
-          Российский<br />банк
-        </button>
-        <button class="bank-btn" data-bank="foreign" type="button">
-          Зарубежный<br />банк
-        </button>
-      </div>
-    </section>
+        <div class="step done">
+          <div class="step-circle">✓</div>
+          <div class="step-label">Выбор</div>
+        </div>
 
-    <section class="card" id="emailBlock">
-      <div class="label">Ваш E-mail для отправки чека</div>
-      <input
-        id="email"
-        class="input"
-        type="email"
-        inputmode="email"
-        autocomplete="email"
-        placeholder="name@example.com"
-      />
-      <div class="error-text" id="emailError">Введите корректный e-mail.</div>
-    </section>
+        <div class="step active">
+          <div class="step-circle">2</div>
+          <div class="step-label">Данные</div>
+        </div>
 
-    <section class="card summary">
-      <div>
-        <div class="price-label">К оплате</div>
-        <div class="price-value">1200 ₽</div>
-      </div>
-      <div class="status" id="statusText">Готово к отправке</div>
-    </section>
+        <div class="step">
+          <div class="step-circle">3</div>
+          <div class="step-label">Оплата</div>
+        </div>
+      </section>
 
-    <footer class="footer">
-      <button class="continue-btn" id="nextBtn" type="button">далее</button>
-      <div class="footer-line"></div>
-    </footer>
+      <section class="card">
+        <div class="label">Товар</div>
+        <h2 class="product-title">Доступ в закрытый канал “Время бояться”</h2>
+
+        <div class="product-row">
+          <div class="avatar"></div>
+          <div>
+            <div class="product-name">Мета катакомбы</div>
+            <div class="product-desc">Название канала изменено на “Мета катакомбы”</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="label">Способ оплаты</div>
+
+        <div class="bank-grid">
+          <button class="bank-btn active" data-bank="russian" type="button">
+            Российский<br />банк
+          </button>
+          <button class="bank-btn" data-bank="foreign" type="button">
+            Зарубежный<br />банк
+          </button>
+        </div>
+      </section>
+
+      <section class="card" id="emailBlock">
+        <div class="label">Ваш E-mail для отправки чека</div>
+        <input
+          id="email"
+          class="input"
+          type="email"
+          inputmode="email"
+          autocomplete="email"
+          placeholder="name@example.com"
+        />
+        <div class="error-text" id="emailError">Введите корректный e-mail.</div>
+      </section>
+
+      <section class="card summary">
+        <div>
+          <div class="price-label">К оплате</div>
+          <div class="price-value">1200 ₽</div>
+        </div>
+        <div class="status" id="statusText">Готово к отправке</div>
+      </section>
+
+      <footer class="footer">
+        <button class="continue-btn" id="nextBtn" type="button">далее</button>
+        <div class="footer-line"></div>
+      </footer>
+    </div>
   </div>
 
   <script>
+    const tg = window.Telegram?.WebApp;
     const state = {
-      bank: 'russian',
-      email: '',
-      user: null,
-      appId: null,
+      bank: "russian",
+      email: ""
     };
 
     const elements = {
-      app: document.getElementById('app'),
-      email: document.getElementById('email'),
-      emailBlock: document.getElementById('emailBlock'),
-      emailError: document.getElementById('emailError'),
-      nextBtn: document.getElementById('nextBtn'),
-      closeBtn: document.getElementById('closeBtn'),
-      statusText: document.getElementById('statusText'),
-      bankButtons: Array.from(document.querySelectorAll('.bank-btn')),
+      app: document.getElementById("app"),
+      email: document.getElementById("email"),
+      emailBlock: document.getElementById("emailBlock"),
+      emailError: document.getElementById("emailError"),
+      nextBtn: document.getElementById("nextBtn"),
+      closeBtn: document.getElementById("closeBtn"),
+      statusText: document.getElementById("statusText"),
+      bankButtons: Array.from(document.querySelectorAll(".bank-btn"))
     };
+
+    let lastTouchEnd = 0;
 
     function setStatus(text) {
       elements.statusText.textContent = text;
@@ -466,7 +504,7 @@
 
     function updateBankButtons() {
       elements.bankButtons.forEach((btn) => {
-        btn.classList.toggle('active', btn.dataset.bank === state.bank);
+        btn.classList.toggle("active", btn.dataset.bank === state.bank);
       });
     }
 
@@ -475,13 +513,13 @@
     }
 
     function showEmailError(show) {
-      elements.email.classList.toggle('error', show);
-      elements.emailError.classList.toggle('show', show);
+      elements.email.classList.toggle("error", show);
+      elements.emailError.classList.toggle("show", show);
     }
 
     function blurActiveElement() {
       const active = document.activeElement;
-      if (active && typeof active.blur === 'function') {
+      if (active && typeof active.blur === "function") {
         active.blur();
       }
     }
@@ -489,45 +527,19 @@
     function scrollInputIntoView() {
       setTimeout(() => {
         elements.emailBlock.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
+          behavior: "smooth",
+          block: "center"
         });
       }, 250);
     }
 
-    async function initVK() {
-      try {
-        await vkBridge.send('VKWebAppInit');
-        setStatus('VK Bridge инициализирован');
-
-        const launchParams = new URLSearchParams(window.location.search);
-        state.appId = launchParams.get('vk_app_id') || null;
-
-        try {
-          const userInfo = await vkBridge.send('VKWebAppGetUserInfo');
-          state.user = userInfo;
-          if (userInfo && userInfo.first_name) {
-            setStatus(`Здравствуйте, ${userInfo.first_name}`);
-          }
-        } catch (userError) {
-          setStatus('Приложение запущено');
-        }
-
-        try {
-          await vkBridge.send('VKWebAppSetViewSettings', {
-            status_bar_style: 'dark',
-            action_bar_color: '#f6f6f6'
-          });
-        } catch (e) {
-          // Optional bridge call, safe to ignore
-        }
-      } catch (error) {
-        console.error('VK init error:', error);
-        setStatus('Ошибка инициализации VK Bridge');
-      }
+    function selectBank(bank) {
+      state.bank = bank;
+      updateBankButtons();
+      setStatus("Готово к отправке");
     }
 
-    async function submitForm() {
+    function nextStep() {
       const email = elements.email.value.trim();
       state.email = email;
 
@@ -535,87 +547,107 @@
         showEmailError(true);
         elements.email.focus();
         scrollInputIntoView();
-        setStatus('Проверьте e-mail');
+        setStatus("Проверьте e-mail");
         return;
       }
 
       showEmailError(false);
       elements.nextBtn.disabled = true;
-      setStatus('Отправка данных...');
+      setStatus("Отправка данных...");
 
       const payload = {
         email: state.email,
-        bank: state.bank,
-        appId: state.appId,
-        userId: state.user?.id || null,
-        ts: Date.now()
+        bank: state.bank
       };
 
       try {
-        await vkBridge.send('VKWebAppShowAlert', {
-          message:
-            'Данные готовы к отправке:\n' +
-            `E-mail: ${payload.email}\n` +
-            `Банк: ${payload.bank === 'russian' ? 'Российский' : 'Зарубежный'}`
-        });
-
-        console.log('Form payload:', payload);
-        setStatus('Данные успешно подготовлены');
+        if (tg && typeof tg.sendData === "function") {
+          tg.sendData(JSON.stringify(payload));
+          setStatus("Данные отправлены");
+        } else {
+          console.log("Telegram payload:", payload);
+          setStatus("Данные готовы");
+        }
       } catch (error) {
-        console.error('Submit error:', error);
-        setStatus('Не удалось отправить данные');
+        console.error("Send error:", error);
+        setStatus("Не удалось отправить данные");
       } finally {
-        elements.nextBtn.disabled = false;
+        setTimeout(() => {
+          elements.nextBtn.disabled = false;
+        }, 250);
       }
     }
 
     function attachEvents() {
       elements.bankButtons.forEach((btn) => {
-        btn.addEventListener('click', (event) => {
+        btn.addEventListener("click", (event) => {
           event.preventDefault();
-          state.bank = btn.dataset.bank;
-          updateBankButtons();
+          event.stopPropagation();
+          selectBank(btn.dataset.bank);
         });
       });
 
-      elements.email.addEventListener('focus', scrollInputIntoView);
-      elements.email.addEventListener('input', () => {
-        if (elements.email.value.trim() === '') {
+      elements.email.addEventListener("focus", scrollInputIntoView);
+
+      elements.email.addEventListener("input", () => {
+        const value = elements.email.value.trim();
+
+        if (value === "") {
           showEmailError(false);
-          setStatus('Готово к отправке');
+          setStatus("Готово к отправке");
           return;
         }
 
-        if (validateEmail(elements.email.value)) {
+        if (validateEmail(value)) {
           showEmailError(false);
-          setStatus('E-mail корректный');
+          setStatus("E-mail корректный");
         }
       });
 
-      elements.nextBtn.addEventListener('click', submitForm);
+      elements.email.addEventListener("click", (event) => {
+        event.stopPropagation();
+      });
 
-      elements.closeBtn.addEventListener('click', async () => {
+      elements.email.addEventListener("touchstart", (event) => {
+        event.stopPropagation();
+      }, { passive: true });
+
+      elements.nextBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        nextStep();
+      });
+
+      elements.closeBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        blurActiveElement();
+
         try {
-          await vkBridge.send('VKWebAppClose', { status: 'success' });
+          if (tg && typeof tg.close === "function") {
+            tg.close();
+          } else {
+            window.close();
+          }
         } catch (error) {
-          window.close();
+          console.error("Close error:", error);
         }
       });
 
-      document.addEventListener('click', (event) => {
-        if (!event.target.closest('input, button, textarea, select, label')) {
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest("input, button, textarea, select, label")) {
           blurActiveElement();
         }
       });
 
-      document.addEventListener('touchstart', (event) => {
-        if (!event.target.closest('input, button, textarea, select, label')) {
+      document.addEventListener("touchstart", (event) => {
+        if (!event.target.closest("input, button, textarea, select, label")) {
           blurActiveElement();
         }
       }, { passive: true });
 
-      let lastTouchEnd = 0;
-      document.addEventListener('touchend', (event) => {
+      document.addEventListener("touchend", (event) => {
         const now = Date.now();
         if (now - lastTouchEnd <= 300) {
           event.preventDefault();
@@ -623,26 +655,48 @@
         lastTouchEnd = now;
       }, { passive: false });
 
-      ['gesturestart', 'gesturechange', 'gestureend'].forEach((eventName) => {
+      ["gesturestart", "gesturechange", "gestureend"].forEach((eventName) => {
         document.addEventListener(eventName, (event) => {
           event.preventDefault();
         }, { passive: false });
       });
 
       if (window.visualViewport) {
-        const updateViewportHeight = () => {
-          elements.app.style.minHeight = `${window.visualViewport.height}px`;
+        const handleViewport = () => {
+          const viewportHeight = window.visualViewport.height;
+          elements.app.style.height = viewportHeight + "px";
         };
 
-        window.visualViewport.addEventListener('resize', updateViewportHeight);
-        window.visualViewport.addEventListener('scroll', updateViewportHeight);
-        updateViewportHeight();
+        window.visualViewport.addEventListener("resize", handleViewport);
+        window.visualViewport.addEventListener("scroll", handleViewport);
+        handleViewport();
+      }
+    }
+
+    function initTelegram() {
+      try {
+        if (!tg) {
+          setStatus("Режим предпросмотра");
+          return;
+        }
+
+        tg.ready();
+        tg.expand();
+
+        if (typeof tg.disableVerticalSwipes === "function") {
+          tg.disableVerticalSwipes();
+        }
+
+        setStatus("Готово к отправке");
+      } catch (error) {
+        console.error("Telegram init error:", error);
+        setStatus("Ошибка инициализации");
       }
     }
 
     updateBankButtons();
     attachEvents();
-    initVK();
+    initTelegram();
   </script>
 </body>
 </html>
