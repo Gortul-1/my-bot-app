@@ -273,6 +273,8 @@ button, input, textarea, select, a {
   let blurTimer = null;
   let focusTimer = null;
   let viewportTimer = null;
+  let hideKeyboardTimer = null;
+  let pendingKeyboardHide = false;
   let lastViewportHeight = 0;
   let lastKnownScrollTop = 0;
 
@@ -341,11 +343,29 @@ button, input, textarea, select, a {
     }
   }
 
-  function hideKeyboard() {
-    const active = document.activeElement;
-    if (active && typeof active.blur === "function") {
-      active.blur();
+  function hideKeyboard(immediate) {
+    clearTimeout(hideKeyboardTimer);
+
+    const run = function () {
+      pendingKeyboardHide = false;
+      const active = document.activeElement;
+      if (active && typeof active.blur === "function") {
+        active.blur();
+      }
+    };
+
+    if (immediate) {
+      run();
+      return;
     }
+
+    pendingKeyboardHide = true;
+    hideKeyboardTimer = setTimeout(run, 90);
+  }
+
+  function cancelPendingKeyboardHide() {
+    pendingKeyboardHide = false;
+    clearTimeout(hideKeyboardTimer);
   }
 
   function rememberScroll() {
@@ -398,6 +418,7 @@ button, input, textarea, select, a {
   }
 
   function handleFocus() {
+    cancelPendingKeyboardHide();
     rememberScroll();
     updateAppHeight();
     scheduleEnsureVisible();
@@ -447,12 +468,16 @@ button, input, textarea, select, a {
     if (event.target.closest("input, button, textarea, select, label")) {
       return;
     }
-    hideKeyboard();
+
+    if (document.activeElement === emailInput) {
+      hideKeyboard(false);
+    }
   }
 
   russianBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
+    cancelPendingKeyboardHide();
     selectBank("russian");
     sendHaptic();
   }, { passive: false });
@@ -460,6 +485,7 @@ button, input, textarea, select, a {
   foreignBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
+    cancelPendingKeyboardHide();
     selectBank("foreign");
     sendHaptic();
   }, { passive: false });
@@ -467,6 +493,7 @@ button, input, textarea, select, a {
   nextBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
+    cancelPendingKeyboardHide();
     sendHaptic();
     nextStep();
   }, { passive: false });
@@ -475,10 +502,12 @@ button, input, textarea, select, a {
   emailInput.addEventListener("blur", handleBlur);
 
   emailInput.addEventListener("click", function (e) {
+    cancelPendingKeyboardHide();
     e.stopPropagation();
   });
 
   emailInput.addEventListener("touchstart", function (e) {
+    cancelPendingKeyboardHide();
     e.stopPropagation();
   }, { passive: true });
 
