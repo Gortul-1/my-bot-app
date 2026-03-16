@@ -26,6 +26,20 @@ html, body {
 body {
   font-family: Inter, sans-serif;
   background: #f6f6f6;
+  position: fixed;
+  inset: 0;
+}
+
+#app {
+  height: 100dvh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: #f6f6f6;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 /* progress bar */
@@ -123,128 +137,137 @@ body {
 
 button, input, textarea, select, a {
   touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 </style>
 </head>
 
 <body>
 
-<div class="flex flex-col h-screen bg-[#f6f6f6] pt-[16px]">
+<div id="app">
+  <div class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
 
-  <!-- progress -->
-  <div class="px-8 mb-6">
-    <div class="progress-nav">
+    <!-- progress -->
+    <div class="px-8 mb-6">
+      <div class="progress-nav">
 
-      <div class="progress-active-line"></div>
+        <div class="progress-active-line"></div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check"></div>
+          </div>
+          <div class="text-black text-xs mt-2 font-medium">Выбор</div>
         </div>
-        <div class="text-black text-xs mt-2 font-medium">Выбор</div>
-      </div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check opacity-30"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check opacity-30"></div>
+          </div>
+          <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
         </div>
-        <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
-      </div>
 
-      <div class="flex flex-col items-center">
-        <div class="progress-circle">
-          <div class="progress-check opacity-30"></div>
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check opacity-30"></div>
+          </div>
+          <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
         </div>
-        <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
-      </div>
 
-    </div>
-  </div>
-
-  <!-- товар -->
-  <div class="flex flex-col px-[30px]">
-
-    <div class="text-[#646464] text-base opacity-80 mb-2">
-      Товар:
-    </div>
-
-    <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-      Доступ в закрытый<br>канал “Время бояться”
-    </div>
-
-    <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-      <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-
-      <div class="flex flex-col text-sm">
-        <div class="font-medium">Мета катакомбы</div>
-        <div class="text-[#8d8d8d] text-xs">
-          Название канала изменено на "Мета катакомбы"
-        </div>
       </div>
     </div>
 
-  </div>
+    <!-- товар -->
+    <div class="flex flex-col px-[30px]">
 
-  <!-- кнопки -->
-  <div class="px-[30px] mt-6">
+      <div class="text-[#646464] text-base opacity-80 mb-2">
+        Товар:
+      </div>
 
-    <div class="text-[#646464] text-base opacity-80 mb-4">
-      Способ оплаты
+      <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+        Доступ в закрытый<br>канал “Время бояться”
+      </div>
+
+      <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+        <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
+
+        <div class="flex flex-col text-sm">
+          <div class="font-medium">Мета катакомбы</div>
+          <div class="text-[#8d8d8d] text-xs">
+            Название канала изменено на "Мета катакомбы"
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="flex gap-[22px]">
+    <!-- кнопки -->
+    <div class="px-[30px] mt-6">
 
-      <button id="russian" onclick="selectBank('russian')" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-        Российский<br>банк
+      <div class="text-[#646464] text-base opacity-80 mb-4">
+        Способ оплаты
+      </div>
+
+      <div class="flex gap-[22px]">
+
+        <button id="russian" onclick="selectBank('russian')" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+          Российский<br>банк
+        </button>
+
+        <button id="foreign" onclick="selectBank('foreign')" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+          Зарубежный<br>банк
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- email -->
+    <div class="px-[30px] mt-6" id="emailWrap">
+
+      <div class="text-[#646464] text-base opacity-80 mb-3">
+        Ваш E-mail для отправки чека
+      </div>
+
+      <input id="email" type="email" class="w-full h-[30px] px-4 input-style"/>
+
+    </div>
+
+    <!-- цена -->
+    <div class="px-[30px] mt-6">
+
+      <div class="text-[#646464] text-[18px]">
+        к оплате
+      </div>
+
+      <div class="text-[30px] font-bold text-[#181818]">
+        1200 р
+      </div>
+
+    </div>
+
+    <!-- кнопка далее -->
+    <div class="flex items-center px-[30px] mt-6">
+
+      <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
+        далее
       </button>
 
-      <button id="foreign" onclick="selectBank('foreign')" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-        Зарубежный<br>банк
-      </button>
+      <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
 
     </div>
 
   </div>
-
-  <!-- email -->
-  <div class="px-[30px] mt-6">
-
-    <div class="text-[#646464] text-base opacity-80 mb-3">
-      Ваш E-mail для отправки чека
-    </div>
-
-    <input id="email" type="email" class="w-full h-[30px] px-4 input-style"/>
-
-  </div>
-
-  <!-- цена -->
-  <div class="px-[30px] mt-6">
-
-    <div class="text-[#646464] text-[18px]">
-      к оплате
-    </div>
-
-    <div class="text-[30px] font-bold text-[#181818]">
-      1200 р
-    </div>
-
-  </div>
-
-  <!-- кнопка далее -->
-  <div class="flex items-center px-[30px] mt-6">
-
-    <button onclick="nextStep()" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
-      далее
-    </button>
-
-    <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
-
-  </div>
-
 </div>
 
 <script>
 let selectedBank = "russian";
+let lastTouchEnd = 0;
+
+const tg = window.Telegram?.WebApp;
+const app = document.getElementById("app");
+const emailInput = document.getElementById("email");
+const emailWrap = document.getElementById("emailWrap");
 
 function selectBank(bank) {
   selectedBank = bank;
@@ -270,14 +293,71 @@ function selectBank(bank) {
 function nextStep() {
   const email = document.getElementById("email").value;
 
-  Telegram.WebApp.sendData(JSON.stringify({
-    email: email,
-    bank: selectedBank
-  }));
+  if (tg && typeof tg.sendData === "function") {
+    tg.sendData(JSON.stringify({
+      email: email,
+      bank: selectedBank
+    }));
+  }
 }
 
+function hideKeyboard() {
+  const active = document.activeElement;
+  if (active && typeof active.blur === "function") {
+    active.blur();
+  }
+}
+
+function updateAppHeight() {
+  if (window.visualViewport) {
+    app.style.height = `${window.visualViewport.height}px`;
+  } else {
+    app.style.height = `${window.innerHeight}px`;
+  }
+}
+
+function scrollEmailIntoView() {
+  setTimeout(() => {
+    emailWrap.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }, 250);
+}
+
+emailInput.addEventListener("focus", () => {
+  updateAppHeight();
+  scrollEmailIntoView();
+});
+
+emailInput.addEventListener("blur", () => {
+  setTimeout(() => {
+    updateAppHeight();
+    app.scrollTop = Math.max(0, app.scrollTop);
+  }, 100);
+});
+
+emailInput.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+
+emailInput.addEventListener("touchstart", (e) => {
+  e.stopPropagation();
+}, { passive: true });
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("input, button, textarea, select, label")) {
+    hideKeyboard();
+  }
+});
+
+document.addEventListener("touchstart", (e) => {
+  if (!e.target.closest("input, button, textarea, select, label")) {
+    hideKeyboard();
+  }
+}, { passive: true });
+
 /* Отключение double-tap zoom */
-let lastTouchEnd = 0;
 document.addEventListener("touchend", function (event) {
   const now = Date.now();
   if (now - lastTouchEnd <= 300) {
@@ -293,8 +373,25 @@ document.addEventListener("touchend", function (event) {
   }, { passive: false });
 });
 
-Telegram.WebApp.ready();
-Telegram.WebApp.expand();
+if (window.visualViewport) {
+  const handleViewportChange = () => {
+    updateAppHeight();
+  };
+
+  window.visualViewport.addEventListener("resize", handleViewportChange);
+  window.visualViewport.addEventListener("scroll", handleViewportChange);
+}
+
+updateAppHeight();
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+
+  if (typeof tg.disableVerticalSwipes === "function") {
+    tg.disableVerticalSwipes();
+  }
+}
 </script>
 
 </body>
