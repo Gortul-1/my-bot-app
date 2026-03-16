@@ -269,11 +269,9 @@ button, input, textarea, select, a {
 
   let selectedBank = "russian";
   let lastTouchEnd = 0;
-  let keyboardOpen = false;
   let blurTimer = null;
-  let focusScrollTimer = null;
+  let focusTimer = null;
   let lastViewportHeight = 0;
-  const BASE_BOTTOM_PADDING = 24;
 
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   const app = document.getElementById("app");
@@ -288,31 +286,13 @@ button, input, textarea, select, a {
     if (window.visualViewport && window.visualViewport.height) {
       return Math.round(window.visualViewport.height);
     }
-    return window.innerHeight;
-  }
-
-  function getLayoutViewportHeight() {
     return Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
-  }
-
-  function getKeyboardInset() {
-    if (!window.visualViewport) return 0;
-    const inset = getLayoutViewportHeight() - Math.round(window.visualViewport.height);
-    return inset > 0 ? inset : 0;
-  }
-
-  function updateBottomSpacing() {
-    const keyboardInset = getKeyboardInset();
-    const safeExtra = keyboardInset > 0 ? keyboardInset + 20 : BASE_BOTTOM_PADDING;
-    content.style.paddingBottom = safeExtra + "px";
   }
 
   function updateAppHeight() {
     const height = getViewportHeight();
     lastViewportHeight = height;
     app.style.height = height + "px";
-    content.style.minHeight = height + "px";
-    updateBottomSpacing();
   }
 
   function updateBankButtons() {
@@ -362,74 +342,54 @@ button, input, textarea, select, a {
   }
 
   function ensureInputVisible() {
+    const appRect = app.getBoundingClientRect();
     const inputRect = emailInput.getBoundingClientRect();
-    const viewportHeight = getViewportHeight();
-    const visibleBottom = viewportHeight - 14;
-    const visibleTop = 10;
+
+    const visibleTop = appRect.top + 12;
+    const visibleBottom = appRect.bottom - 16;
 
     if (inputRect.bottom > visibleBottom) {
-      const delta = inputRect.bottom - visibleBottom;
+      const diff = inputRect.bottom - visibleBottom;
       app.scrollTo({
-        top: app.scrollTop + delta + 18,
+        top: app.scrollTop + diff + 18,
         behavior: "smooth"
       });
-      return;
-    }
-
-    if (inputRect.top < visibleTop) {
-      const delta = visibleTop - inputRect.top;
+    } else if (inputRect.top < visibleTop) {
+      const diff = visibleTop - inputRect.top;
       app.scrollTo({
-        top: Math.max(0, app.scrollTop - delta - 12),
+        top: Math.max(0, app.scrollTop - diff - 12),
         behavior: "smooth"
       });
     }
   }
 
-  function scrollEmailIntoView() {
-    clearTimeout(focusScrollTimer);
-
-    focusScrollTimer = setTimeout(() => {
-      emailWrap.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-        inline: "nearest"
-      });
-
+  function focusInputFix() {
+    clearTimeout(focusTimer);
+    focusTimer = setTimeout(() => {
+      updateAppHeight();
+      ensureInputVisible();
       setTimeout(ensureInputVisible, 120);
-      setTimeout(ensureInputVisible, 280);
+      setTimeout(ensureInputVisible, 260);
       setTimeout(ensureInputVisible, 420);
-    }, 260);
-  }
-
-  function handleFocus() {
-    keyboardOpen = true;
-    updateAppHeight();
-    scrollEmailIntoView();
+    }, 120);
   }
 
   function handleBlur() {
     clearTimeout(blurTimer);
     blurTimer = setTimeout(() => {
-      keyboardOpen = false;
       updateAppHeight();
     }, 180);
   }
 
   function handleViewportChange() {
     const newHeight = getViewportHeight();
-    const heightDelta = Math.abs(newHeight - lastViewportHeight);
+    const delta = Math.abs(newHeight - lastViewportHeight);
 
     updateAppHeight();
 
-    if (document.activeElement === emailInput) {
-      keyboardOpen = true;
-      if (heightDelta > 20) {
-        scrollEmailIntoView();
-      } else {
-        ensureInputVisible();
-      }
-    } else if (keyboardOpen && heightDelta > 20) {
-      keyboardOpen = false;
+    if (document.activeElement === emailInput && delta > 10) {
+      ensureInputVisible();
+      setTimeout(ensureInputVisible, 100);
     }
   }
 
@@ -461,7 +421,7 @@ button, input, textarea, select, a {
     nextStep();
   }, { passive: false });
 
-  emailInput.addEventListener("focus", handleFocus);
+  emailInput.addEventListener("focus", focusInputFix);
   emailInput.addEventListener("blur", handleBlur);
 
   emailInput.addEventListener("click", function (e) {
@@ -496,7 +456,6 @@ button, input, textarea, select, a {
 
   window.addEventListener("orientationchange", function () {
     setTimeout(updateAppHeight, 250);
-    setTimeout(ensureInputVisible, 400);
   });
 
   window.addEventListener("resize", function () {
