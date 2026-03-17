@@ -109,6 +109,7 @@ button, input, textarea, select, a {
   width: calc(100% - 28px);
 }
 
+/* inactive circle updated only */
 .progress-circle {
   width: 28px;
   height: 28px;
@@ -116,10 +117,11 @@ button, input, textarea, select, a {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #d8d8d8;
+  background: linear-gradient(180deg, #dfdfdf 0%, #cdcdcd 100%);
   box-shadow:
-    inset 0 1px 2px rgba(255,255,255,0.45),
-    inset 0 -1px 2px rgba(0,0,0,0.08);
+    inset 0 1px 1px rgba(255,255,255,0.55),
+    inset 0 -1px 2px rgba(0,0,0,0.10),
+    0 1px 2px rgba(0,0,0,0.06);
   flex-shrink: 0;
   position: relative;
   z-index: 2;
@@ -139,7 +141,7 @@ button, input, textarea, select, a {
   border-bottom: 2px solid #2b2b2b;
   transform: rotate(-45deg);
   margin-top: -2px;
-  opacity: 0.18;
+  opacity: 0.16;
 }
 
 .progress-circle.active .progress-check {
@@ -296,90 +298,10 @@ button, input, textarea, select, a {
 
 .step3-screen {
   min-height: 100dvh;
-  background: #f6f6f6;
+  background: #ffffff;
   padding: 16px 0 24px;
   display: flex;
   flex-direction: column;
-}
-
-.step3-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0 30px;
-}
-
-.step3-title {
-  margin-top: 46px;
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 700;
-  color: #181818;
-}
-
-.step3-card {
-  margin-top: 18px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 18px 18px 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-}
-
-.step3-label {
-  font-size: 14px;
-  color: #7c7c7c;
-  margin-bottom: 6px;
-}
-
-.step3-value {
-  font-size: 18px;
-  color: #181818;
-  font-weight: 600;
-  word-break: break-word;
-}
-
-.step3-divider {
-  height: 1px;
-  background: #e2e2e2;
-  margin: 14px 0;
-}
-
-.step3-note {
-  margin-top: 18px;
-  font-size: 13px;
-  line-height: 1.35;
-  color: #747474;
-}
-
-.step3-next-wrap {
-  display: flex;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 24px;
-}
-
-.step3-pay-btn {
-  width: 150px;
-  height: 58px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  background: #1f1f1f;
-  color: #ffffff;
-  font-size: 26px;
-  line-height: 1;
-  font-weight: 400;
-  border: none;
-  border-radius: 40px;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
-}
-
-.step3-next-line {
-  height: 2px;
-  background: #d1d5db;
-  flex-grow: 1;
-  margin-right: -30px;
 }
 
 .hidden {
@@ -591,39 +513,6 @@ button, input, textarea, select, a {
         </div>
       </div>
     </div>
-
-    <div class="step3-body">
-      <div class="step3-title">Оплата</div>
-
-      <div class="step3-card">
-        <div class="step3-label">Товар</div>
-        <div id="page3Product" class="step3-value">Доступ в закрытый канал “Время бояться”</div>
-
-        <div class="step3-divider"></div>
-
-        <div class="step3-label">Способ оплаты</div>
-        <div id="page3Bank" class="step3-value">Российский банк</div>
-
-        <div class="step3-divider"></div>
-
-        <div class="step3-label">Ваш E-mail</div>
-        <div id="page3Email" class="step3-value">example@email.com</div>
-
-        <div class="step3-divider"></div>
-
-        <div class="step3-label">К оплате</div>
-        <div class="step3-value">1200 р</div>
-      </div>
-
-      <div class="step3-note">
-        Проверьте данные и нажмите кнопку для завершения оплаты.
-      </div>
-
-      <div class="step3-next-wrap">
-        <button id="payBtn" type="button" class="step3-pay-btn">оплата</button>
-        <div class="step3-next-line"></div>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -649,11 +538,7 @@ button, input, textarea, select, a {
   const page2Email = document.getElementById("page2Email");
   const page2Bank = document.getElementById("page2Bank");
   const page2Product = document.getElementById("page2Product");
-  const page3Email = document.getElementById("page3Email");
-  const page3Bank = document.getElementById("page3Bank");
-  const page3Product = document.getElementById("page3Product");
   const page2NextBtn = document.getElementById("page2NextBtn");
-  const payBtn = document.getElementById("payBtn");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -696,12 +581,6 @@ button, input, textarea, select, a {
     page2Email.textContent = payload.email || "-введенный имел на пред этапе-";
   }
 
-  function renderStep3(payload) {
-    page3Product.textContent = payload.product;
-    page3Bank.textContent = payload.bankLabel;
-    page3Email.textContent = payload.email || "-введенный имел на пред этапе-";
-  }
-
   function showPage(pageNumber) {
     page1.classList.add("hidden");
     page2.classList.add("hidden");
@@ -736,13 +615,10 @@ button, input, textarea, select, a {
 
     const payload = buildPayload();
     renderStep2(payload);
-    renderStep3(payload);
     openStep2();
   }
 
   function continueToStep3() {
-    const payload = buildPayload();
-    renderStep3(payload);
     openStep3();
   }
 
@@ -945,13 +821,6 @@ button, input, textarea, select, a {
     e.stopPropagation();
     sendHaptic();
     continueToStep3();
-  }, { passive: false });
-
-  payBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-    sendHaptic();
-    continueToPayment();
   }, { passive: false });
 
   emailInput.addEventListener("focus", handleFocus);
