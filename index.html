@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -286,6 +285,7 @@ button, input, textarea, select, a {
   let focusTimer = null;
   let blurTimer = null;
   let viewportRaf = null;
+  let delayedFocusTimer = null;
 
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   const app = document.getElementById("app");
@@ -394,6 +394,13 @@ button, input, textarea, select, a {
     }, 40);
   }
 
+  function scheduleDelayedFocus() {
+    clearTimeout(delayedFocusTimer);
+    delayedFocusTimer = setTimeout(function () {
+      emailInput.focus();
+    }, 1000);
+  }
+
   function handleFocus() {
     clearTimeout(blurTimer);
     applyKeyboardLayout();
@@ -433,6 +440,8 @@ button, input, textarea, select, a {
       return;
     }
 
+    clearTimeout(delayedFocusTimer);
+
     if (document.activeElement === emailInput) {
       emailInput.blur();
     }
@@ -463,12 +472,20 @@ button, input, textarea, select, a {
   emailInput.addEventListener("blur", handleBlur);
 
   emailInput.addEventListener("click", function (e) {
+    e.preventDefault();
     e.stopPropagation();
-  });
+    if (!isKeyboardOpen()) {
+      scheduleDelayedFocus();
+    }
+  }, { passive: false });
 
   emailInput.addEventListener("touchstart", function (e) {
+    e.preventDefault();
     e.stopPropagation();
-  }, { passive: true });
+    if (!isKeyboardOpen()) {
+      scheduleDelayedFocus();
+    }
+  }, { passive: false });
 
   document.addEventListener("click", handleOutsidePointer, { passive: true });
   document.addEventListener("touchstart", handleOutsidePointer, { passive: true });
@@ -525,4 +542,3 @@ button, input, textarea, select, a {
 
 </body>
 </html>
-```
