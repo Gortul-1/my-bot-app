@@ -189,28 +189,35 @@ button, input, textarea, select, a {
   padding: 16px 0 24px;
 }
 
-.step2-title {
-  padding: 0 31px;
-  margin-top: 46px;
-  font-size: 17px;
-  line-height: 1.15;
-  font-weight: 700;
-  color: #232323;
+.step2-next-wrap {
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  margin-top: 24px;
 }
 
-.step2-card {
-  margin: 13px 27px 0;
-  background: #f8f8f8;
-  border: 1px solid #d8d8d8;
-  border-radius: 11px;
-  box-shadow:
-    0 2px 8px rgba(0,0,0,0.08),
-    0 1px 1px rgba(255,255,255,0.7) inset;
-  overflow: hidden;
+.step2-next-btn {
+  width: 150px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #1f1f1f;
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 400;
+  border: none;
+  border-radius: 40px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
 }
 
-.step2-row {
-  padding: 11px 17px 10px;
+.step2-next-line {
+  height: 2px;
+  background: #d1d5db;
+  flex-grow: 1;
+  margin-right: -30px;
 }
 
 .step2-divider {
@@ -322,9 +329,13 @@ button, input, textarea, select, a {
           Доступ в закрытый<br>канал “Время бояться”
         </div>
 
-        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-          <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-
+        <div class="step2-next-wrap">
+  <button id="page2NextBtn" type="button" class="step2-next-btn">
+    <span class="block w-full text-center">далее</span>
+  </button>
+  <div class="step2-next-line"></div>
+</div>
+        
           <div class="flex flex-col text-sm">
             <div class="font-medium">Мета катакомбы</div>
             <div class="text-[#8d8d8d] text-xs">
