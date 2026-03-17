@@ -62,6 +62,11 @@ button, input, textarea, select, a {
 
 /* unified progress bar */
 
+.progress-wrap {
+  padding: 0 32px;
+  margin-bottom: 24px;
+}
+
 .progress-nav {
   position: relative;
   display: flex;
@@ -87,10 +92,21 @@ button, input, textarea, select, a {
   position: absolute;
   top: 14px;
   left: 14px;
-  width: calc(50% - 14px);
   height: 2px;
   background: #bdbdbd;
   z-index: 1;
+}
+
+.progress-active-line.step-1 {
+  width: 0;
+}
+
+.progress-active-line.step-2 {
+  width: calc(50% - 14px);
+}
+
+.progress-active-line.step-3 {
+  width: calc(100% - 28px);
 }
 
 .progress-circle {
@@ -100,13 +116,20 @@ button, input, textarea, select, a {
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #d8d8d8;
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,0.45),
+    inset 0 -1px 2px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.progress-circle.active {
   background: #ffffff;
   box-shadow:
     0 3px 5px rgba(0,0,0,0.15),
     inset 0 1px 2px rgba(0,0,0,0.12);
-  flex-shrink: 0;
-  position: relative;
-  z-index: 2;
 }
 
 .progress-check {
@@ -116,6 +139,11 @@ button, input, textarea, select, a {
   border-bottom: 2px solid #2b2b2b;
   transform: rotate(-45deg);
   margin-top: -2px;
+  opacity: 0.18;
+}
+
+.progress-circle.active .progress-check {
+  opacity: 1;
 }
 
 .progress-label {
@@ -128,19 +156,6 @@ button, input, textarea, select, a {
 
 .progress-label.active {
   color: #232323;
-}
-
-.progress-circle.done .progress-check,
-.progress-circle.active .progress-check {
-  opacity: 1;
-}
-
-.progress-circle.inactive {
-  opacity: 0.56;
-}
-
-.progress-circle.inactive .progress-check {
-  opacity: 0.22;
 }
 
 /* page 1 controls */
@@ -187,6 +202,8 @@ button, input, textarea, select, a {
   min-height: 100dvh;
   background: #f6f6f6;
   padding: 16px 0 24px;
+  display: flex;
+  flex-direction: column;
 }
 
 .step2-title {
@@ -247,29 +264,122 @@ button, input, textarea, select, a {
 .step2-next-wrap {
   display: flex;
   align-items: center;
-  margin-top: 90px;
-  padding-left: 66px;
+  margin-top: auto;
+  padding: 24px 30px 0;
 }
 
 .step2-next-btn {
-  width: 74px;
-  height: 40px;
-  border: none;
-  border-radius: 22px;
+  width: 150px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: #1f1f1f;
   color: #ffffff;
-  font-size: 19px;
+  font-size: 26px;
   line-height: 1;
-  font-weight: 700;
-  box-shadow:
-    0 7px 16px rgba(0,0,0,0.34),
-    0 2px 4px rgba(255,255,255,0.08) inset;
+  font-weight: 400;
+  border: none;
+  border-radius: 40px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
 }
 
 .step2-next-line {
   height: 2px;
+  background: #d1d5db;
+  flex-grow: 1;
+  margin-right: -30px;
+}
+
+/* step 3 */
+
+.step3-screen {
+  min-height: 100dvh;
+  background: #f6f6f6;
+  padding: 16px 0 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.step3-body {
   flex: 1;
-  background: #d3d3d3;
+  display: flex;
+  flex-direction: column;
+  padding: 0 30px;
+}
+
+.step3-title {
+  margin-top: 46px;
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #181818;
+}
+
+.step3-card {
+  margin-top: 18px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 18px 18px 16px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+.step3-label {
+  font-size: 14px;
+  color: #7c7c7c;
+  margin-bottom: 6px;
+}
+
+.step3-value {
+  font-size: 18px;
+  color: #181818;
+  font-weight: 600;
+  word-break: break-word;
+}
+
+.step3-divider {
+  height: 1px;
+  background: #e2e2e2;
+  margin: 14px 0;
+}
+
+.step3-note {
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: #747474;
+}
+
+.step3-next-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.step3-pay-btn {
+  width: 150px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: #1f1f1f;
+  color: #ffffff;
+  font-size: 26px;
+  line-height: 1;
+  font-weight: 400;
+  border: none;
+  border-radius: 40px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+}
+
+.step3-next-line {
+  height: 2px;
+  background: #d1d5db;
+  flex-grow: 1;
+  margin-right: -30px;
 }
 
 .hidden {
@@ -285,26 +395,26 @@ button, input, textarea, select, a {
     <div id="content" class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
 
       <!-- progress -->
-      <div class="px-8 mb-6">
+      <div class="progress-wrap">
         <div class="progress-nav">
-          <div class="progress-active-line"></div>
+          <div class="progress-active-line step-1"></div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle done">
+            <div class="progress-circle active">
               <div class="progress-check"></div>
             </div>
             <div class="progress-label active">Выбор</div>
           </div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle active">
+            <div class="progress-circle">
               <div class="progress-check"></div>
             </div>
             <div class="progress-label">Данные</div>
           </div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle inactive">
+            <div class="progress-circle">
               <div class="progress-check"></div>
             </div>
             <div class="progress-label">Оплата</div>
@@ -383,13 +493,13 @@ button, input, textarea, select, a {
   </div>
 
   <div id="page2" class="hidden step2-screen">
-    <!-- same progress bar as page 1 -->
-    <div class="px-8 mb-6">
+    <!-- progress -->
+    <div class="progress-wrap">
       <div class="progress-nav">
-        <div class="progress-active-line"></div>
+        <div class="progress-active-line step-2"></div>
 
         <div class="flex flex-col items-center">
-          <div class="progress-circle done">
+          <div class="progress-circle">
             <div class="progress-check"></div>
           </div>
           <div class="progress-label">Выбор</div>
@@ -403,7 +513,7 @@ button, input, textarea, select, a {
         </div>
 
         <div class="flex flex-col items-center">
-          <div class="progress-circle inactive">
+          <div class="progress-circle">
             <div class="progress-check"></div>
           </div>
           <div class="progress-label">Оплата</div>
@@ -452,6 +562,69 @@ button, input, textarea, select, a {
       <div class="step2-next-line"></div>
     </div>
   </div>
+
+  <div id="page3" class="hidden step3-screen">
+    <!-- progress -->
+    <div class="progress-wrap">
+      <div class="progress-nav">
+        <div class="progress-active-line step-3"></div>
+
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check"></div>
+          </div>
+          <div class="progress-label">Выбор</div>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="progress-circle">
+            <div class="progress-check"></div>
+          </div>
+          <div class="progress-label">Данные</div>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <div class="progress-circle active">
+            <div class="progress-check"></div>
+          </div>
+          <div class="progress-label active">Оплата</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step3-body">
+      <div class="step3-title">Оплата</div>
+
+      <div class="step3-card">
+        <div class="step3-label">Товар</div>
+        <div id="page3Product" class="step3-value">Доступ в закрытый канал “Время бояться”</div>
+
+        <div class="step3-divider"></div>
+
+        <div class="step3-label">Способ оплаты</div>
+        <div id="page3Bank" class="step3-value">Российский банк</div>
+
+        <div class="step3-divider"></div>
+
+        <div class="step3-label">Ваш E-mail</div>
+        <div id="page3Email" class="step3-value">example@email.com</div>
+
+        <div class="step3-divider"></div>
+
+        <div class="step3-label">К оплате</div>
+        <div class="step3-value">1200 р</div>
+      </div>
+
+      <div class="step3-note">
+        Проверьте данные и нажмите кнопку для завершения оплаты.
+      </div>
+
+      <div class="step3-next-wrap">
+        <button id="payBtn" type="button" class="step3-pay-btn">оплата</button>
+        <div class="step3-next-line"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -469,13 +642,18 @@ button, input, textarea, select, a {
   const app = document.getElementById("app");
   const page1 = document.getElementById("page1");
   const page2 = document.getElementById("page2");
+  const page3 = document.getElementById("page3");
   const content = document.getElementById("content");
   const emailWrap = document.getElementById("emailWrap");
   const emailInput = document.getElementById("email");
   const page2Email = document.getElementById("page2Email");
   const page2Bank = document.getElementById("page2Bank");
   const page2Product = document.getElementById("page2Product");
+  const page3Email = document.getElementById("page3Email");
+  const page3Bank = document.getElementById("page3Bank");
+  const page3Product = document.getElementById("page3Product");
   const page2NextBtn = document.getElementById("page2NextBtn");
+  const payBtn = document.getElementById("payBtn");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -518,10 +696,34 @@ button, input, textarea, select, a {
     page2Email.textContent = payload.email || "-введенный имел на пред этапе-";
   }
 
-  function openStep2() {
+  function renderStep3(payload) {
+    page3Product.textContent = payload.product;
+    page3Bank.textContent = payload.bankLabel;
+    page3Email.textContent = payload.email || "-введенный имел на пред этапе-";
+  }
+
+  function showPage(pageNumber) {
     page1.classList.add("hidden");
-    page2.classList.remove("hidden");
+    page2.classList.add("hidden");
+    page3.classList.add("hidden");
+
+    if (pageNumber === 1) {
+      page1.classList.remove("hidden");
+    } else if (pageNumber === 2) {
+      page2.classList.remove("hidden");
+    } else {
+      page3.classList.remove("hidden");
+    }
+
     app.scrollTo({ top: 0, behavior: "auto" });
+  }
+
+  function openStep2() {
+    showPage(2);
+  }
+
+  function openStep3() {
+    showPage(3);
   }
 
   function nextStep() {
@@ -534,7 +736,14 @@ button, input, textarea, select, a {
 
     const payload = buildPayload();
     renderStep2(payload);
+    renderStep3(payload);
     openStep2();
+  }
+
+  function continueToStep3() {
+    const payload = buildPayload();
+    renderStep3(payload);
+    openStep3();
   }
 
   function continueToPayment() {
@@ -732,6 +941,13 @@ button, input, textarea, select, a {
   }, { passive: false });
 
   page2NextBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    sendHaptic();
+    continueToStep3();
+  }, { passive: false });
+
+  payBtn.addEventListener("click", function (e) {
     e.preventDefault();
     e.stopPropagation();
     sendHaptic();
