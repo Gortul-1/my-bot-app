@@ -206,31 +206,28 @@ button, input, textarea, select, a {
   flex-direction: column;
 }
 
-.step2-back-wrap {
-  padding: 0 27px;
-}
-
 .step2-back-btn {
-  width: 44px;
-  height: 44px;
+  width: 54px;
+  height: 54px;
   border: none;
-  border-radius: 50%;
-  background: #ffffff;
+  border-radius: 999px;
+  background: #1f1f1f;
   box-shadow:
-    0 3px 8px rgba(0,0,0,0.12),
-    inset 0 1px 2px rgba(0,0,0,0.08);
+    0 8px 18px rgba(0,0,0,0.30),
+    0 25px 60px rgba(0,0,0,0.20);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
 }
 
 .step2-back-icon {
-  width: 10px;
-  height: 10px;
-  border-left: 2px solid #232323;
-  border-bottom: 2px solid #232323;
+  width: 13px;
+  height: 13px;
+  border-left: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
   transform: rotate(45deg);
-  margin-left: 3px;
+  margin-left: 4px;
 }
 
 .step2-title {
@@ -291,6 +288,7 @@ button, input, textarea, select, a {
 .step2-next-wrap {
   display: flex;
   align-items: center;
+  gap: 14px;
   margin-top: auto;
   padding: 24px 30px 0;
 }
@@ -310,6 +308,7 @@ button, input, textarea, select, a {
   border: none;
   border-radius: 40px;
   box-shadow: 0 8px 18px rgba(0,0,0,0.24);
+  flex: 0 0 auto;
 }
 
 .step2-next-line {
@@ -468,12 +467,6 @@ button, input, textarea, select, a {
       </div>
     </div>
 
-    <div class="step2-back-wrap">
-      <button id="page2BackBtn" type="button" class="step2-back-btn" aria-label="Назад">
-        <span class="step2-back-icon"></span>
-      </button>
-    </div>
-
     <div class="step2-title">
       Убедитесь, что введенна<br>правильная информация
     </div>
@@ -511,6 +504,9 @@ button, input, textarea, select, a {
     </div>
 
     <div class="step2-next-wrap">
+      <button id="page2BackBtn" type="button" class="step2-back-btn" aria-label="Назад">
+        <span class="step2-back-icon"></span>
+      </button>
       <button id="page2NextBtn" type="button" class="step2-next-btn">далее</button>
       <div class="step2-next-line"></div>
     </div>
