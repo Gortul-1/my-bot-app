@@ -109,7 +109,6 @@ button, input, textarea, select, a {
   width: calc(100% - 28px);
 }
 
-/* inactive circle updated only */
 .progress-circle {
   width: 28px;
   height: 28px;
@@ -207,6 +206,33 @@ button, input, textarea, select, a {
   flex-direction: column;
 }
 
+.step2-back-wrap {
+  padding: 0 27px;
+}
+
+.step2-back-btn {
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.12),
+    inset 0 1px 2px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step2-back-icon {
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid #232323;
+  border-bottom: 2px solid #232323;
+  transform: rotate(45deg);
+  margin-left: 3px;
+}
+
 .step2-title {
   padding: 0 31px;
   margin-top: 46px;
@@ -297,7 +323,7 @@ button, input, textarea, select, a {
 
 .step3-screen {
   min-height: 100dvh;
-  background: #ffffff;
+  background: #f6f6f6;
   padding: 16px 0 24px;
   display: flex;
   flex-direction: column;
@@ -442,6 +468,12 @@ button, input, textarea, select, a {
       </div>
     </div>
 
+    <div class="step2-back-wrap">
+      <button id="page2BackBtn" type="button" class="step2-back-btn" aria-label="Назад">
+        <span class="step2-back-icon"></span>
+      </button>
+    </div>
+
     <div class="step2-title">
       Убедитесь, что введенна<br>правильная информация
     </div>
@@ -538,6 +570,7 @@ button, input, textarea, select, a {
   const page2Bank = document.getElementById("page2Bank");
   const page2Product = document.getElementById("page2Product");
   const page2NextBtn = document.getElementById("page2NextBtn");
+  const page2BackBtn = document.getElementById("page2BackBtn");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -580,6 +613,12 @@ button, input, textarea, select, a {
     page2Email.textContent = payload.email || "-введенный имел на пред этапе-";
   }
 
+  function resetStep2() {
+    page2Product.textContent = "";
+    page2Bank.textContent = "";
+    page2Email.textContent = "";
+  }
+
   function showPage(pageNumber) {
     page1.classList.add("hidden");
     page2.classList.add("hidden");
@@ -602,6 +641,11 @@ button, input, textarea, select, a {
 
   function openStep3() {
     showPage(3);
+  }
+
+  function backToStep1() {
+    resetStep2();
+    showPage(1);
   }
 
   function nextStep() {
@@ -813,6 +857,13 @@ button, input, textarea, select, a {
     e.stopPropagation();
     sendHaptic();
     nextStep();
+  }, { passive: false });
+
+  page2BackBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    sendHaptic();
+    backToStep1();
   }, { passive: false });
 
   page2NextBtn.addEventListener("click", function (e) {
