@@ -361,7 +361,7 @@ button, input, textarea, select, a {
   function nextStep() {
     const emailValue = emailInput.value.trim();
 
-    if (!emailValue) {
+    if (!emailValue || !emailInput.checkValidity()) {
       emailInput.focus();
       return;
     }
