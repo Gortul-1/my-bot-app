@@ -161,118 +161,124 @@ button, input, textarea, select, a {
 <body>
 
 <div id="app">
-  <div id="content" class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
+  <div id="page1">
+    <div id="content" class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
 
-    <!-- progress -->
-    <div class="px-8 mb-6">
-      <div class="progress-nav">
+      <!-- progress -->
+      <div class="px-8 mb-6">
+        <div class="progress-nav">
 
-        <div class="progress-active-line"></div>
+          <div class="progress-active-line"></div>
 
-        <div class="flex flex-col items-center">
-          <div class="progress-circle">
-            <div class="progress-check"></div>
+          <div class="flex flex-col items-center">
+            <div class="progress-circle">
+              <div class="progress-check"></div>
+            </div>
+            <div class="text-black text-xs mt-2 font-medium">Выбор</div>
           </div>
-          <div class="text-black text-xs mt-2 font-medium">Выбор</div>
-        </div>
 
-        <div class="flex flex-col items-center">
-          <div class="progress-circle">
-            <div class="progress-check opacity-30"></div>
+          <div class="flex flex-col items-center">
+            <div class="progress-circle">
+              <div class="progress-check opacity-30"></div>
+            </div>
+            <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
           </div>
-          <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
-        </div>
 
-        <div class="flex flex-col items-center">
-          <div class="progress-circle">
-            <div class="progress-check opacity-30"></div>
+          <div class="flex flex-col items-center">
+            <div class="progress-circle">
+              <div class="progress-check opacity-30"></div>
+            </div>
+            <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
           </div>
-          <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
-        </div>
 
-      </div>
-    </div>
-
-    <!-- товар -->
-    <div class="flex flex-col px-[30px]">
-
-      <div class="text-[#646464] text-base opacity-80 mb-2">
-        Товар:
-      </div>
-
-      <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
-        Доступ в закрытый<br>канал “Время бояться”
-      </div>
-
-      <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
-        <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
-
-        <div class="flex flex-col text-sm">
-          <div class="font-medium">Мета катакомбы</div>
-          <div class="text-[#8d8d8d] text-xs">
-            Название канала изменено на "Мета катакомбы"
-          </div>
         </div>
       </div>
 
-    </div>
+      <!-- товар -->
+      <div class="flex flex-col px-[30px]">
 
-    <!-- кнопки -->
-    <div class="px-[30px] mt-6">
+        <div class="text-[#646464] text-base opacity-80 mb-2">
+          Товар:
+        </div>
 
-      <div class="text-[#646464] text-base opacity-80 mb-4">
-        Способ оплаты
+        <div class="text-[24px] font-semibold text-black leading-[1.2] mb-4">
+          Доступ в закрытый<br>канал “Время бояться”
+        </div>
+
+        <div class="flex items-center gap-3 bg-white rounded-[20px] p-3 shadow">
+          <div class="w-[44px] h-[44px] rounded-full bg-red-800 flex-shrink-0"></div>
+
+          <div class="flex flex-col text-sm">
+            <div class="font-medium">Мета катакомбы</div>
+            <div class="text-[#8d8d8d] text-xs">
+              Название канала изменено на "Мета катакомбы"
+            </div>
+          </div>
+        </div>
+
       </div>
 
-      <div class="flex gap-[22px]">
+      <!-- кнопки -->
+      <div class="px-[30px] mt-6">
 
-        <button id="russian" type="button" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-          Российский<br>банк
+        <div class="text-[#646464] text-base opacity-80 mb-4">
+          Способ оплаты
+        </div>
+
+        <div class="flex gap-[22px]">
+
+          <button id="russian" type="button" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+            Российский<br>банк
+          </button>
+
+          <button id="foreign" type="button" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
+            Зарубежный<br>банк
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- email -->
+      <div class="px-[30px] mt-6" id="emailWrap">
+
+        <div class="text-[#646464] text-base opacity-80 mb-3">
+          Ваш E-mail для отправки чека
+        </div>
+
+        <input id="email" type="email" inputmode="email" autocomplete="email" class="w-full h-[30px] px-4 input-style"/>
+
+      </div>
+
+      <!-- цена -->
+      <div class="px-[30px] mt-6">
+
+        <div class="text-[#646464] text-[18px]">
+          к оплате
+        </div>
+
+        <div class="text-[30px] font-bold text-[#181818]">
+          1200 р
+        </div>
+
+      </div>
+
+      <!-- кнопка далее -->
+      <div class="flex items-center px-[30px] mt-6">
+
+        <button id="nextBtn" type="button" class="w-[150px] h-[58px] flex items-center justify-center text-center bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg leading-none">
+          <span class="block w-full text-center">далее</span>
         </button>
 
-        <button id="foreign" type="button" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
-          Зарубежный<br>банк
-        </button>
+        <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
 
       </div>
 
     </div>
+  </div>
 
-    <!-- email -->
-    <div class="px-[30px] mt-6" id="emailWrap">
-
-      <div class="text-[#646464] text-base opacity-80 mb-3">
-        Ваш E-mail для отправки чека
-      </div>
-
-      <input id="email" type="email" inputmode="email" autocomplete="email" class="w-full h-[30px] px-4 input-style"/>
-
-    </div>
-
-    <!-- цена -->
-    <div class="px-[30px] mt-6">
-
-      <div class="text-[#646464] text-[18px]">
-        к оплате
-      </div>
-
-      <div class="text-[30px] font-bold text-[#181818]">
-        1200 р
-      </div>
-
-    </div>
-
-    <!-- кнопка далее -->
-    <div class="flex items-center px-[30px] mt-6">
-
-      <button id="nextBtn" type="button" class="flex items-center justify-center px-6 py-2 bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg">
-        далее
-      </button>
-
-      <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
-
-    </div>
-
+  <div id="page2" class="hidden min-h-[100dvh] bg-[#f6f6f6] flex items-center justify-center">
+    <div class="text-[32px] font-semibold text-black">станица 2</div>
   </div>
 </div>
 
@@ -289,6 +295,8 @@ button, input, textarea, select, a {
   let isTrackingKeyboard = false;
 
   const app = document.getElementById("app");
+  const page1 = document.getElementById("page1");
+  const page2 = document.getElementById("page2");
   const content = document.getElementById("content");
   const emailWrap = document.getElementById("emailWrap");
   const emailInput = document.getElementById("email");
@@ -317,6 +325,9 @@ button, input, textarea, select, a {
       email: emailInput.value.trim(),
       bank: selectedBank
     };
+
+    page1.classList.add("hidden");
+    page2.classList.remove("hidden");
 
     if (tg && typeof tg.sendData === "function") {
       try {
