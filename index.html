@@ -155,6 +155,173 @@ button, input, textarea, select, a {
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
+
+/* STEP 2 exact-like UI */
+.step2-progress-nav {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+}
+
+.step2-progress-nav::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  height: 2px;
+  background: #d8d8d8;
+  z-index: 1;
+}
+
+.step2-progress-active-line {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: calc(50% - 14px);
+  height: 2px;
+  background: #bbbbbb;
+  z-index: 1;
+}
+
+.step2-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 2px 5px rgba(0,0,0,0.12),
+    inset 0 1px 2px rgba(0,0,0,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+}
+
+.step2-circle.inactive {
+  opacity: 0.56;
+}
+
+.step2-circle.active .progress-check,
+.step2-circle.done .progress-check {
+  opacity: 1;
+}
+
+.step2-circle.inactive .progress-check {
+  opacity: 0.22;
+}
+
+.step2-label {
+  margin-top: 10px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  color: #b5b5b5;
+}
+
+.step2-label.active {
+  color: #232323;
+}
+
+.step2-screen {
+  min-height: 100dvh;
+  background: #f6f6f6;
+  padding: 15px 0 24px;
+}
+
+.step2-title {
+  padding: 0 31px;
+  margin-top: 46px;
+  font-size: 17px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: #232323;
+}
+
+.step2-card {
+  margin: 13px 27px 0;
+  background: #f8f8f8;
+  border: 1px solid #d8d8d8;
+  border-radius: 11px;
+  box-shadow:
+    0 2px 8px rgba(0,0,0,0.08),
+    0 1px 1px rgba(255,255,255,0.7) inset;
+  overflow: hidden;
+}
+
+.step2-row {
+  padding: 11px 17px 10px;
+}
+
+.step2-divider {
+  height: 1px;
+  margin: 0 0 0 17px;
+  background: #d9d9d9;
+}
+
+.step2-row-label {
+  font-size: 13px;
+  line-height: 1.2;
+  color: #7c7c7c;
+  margin-bottom: 7px;
+  font-weight: 400;
+}
+
+.step2-row-value {
+  font-size: 13px;
+  line-height: 1.28;
+  color: #171717;
+  font-weight: 400;
+  word-break: break-word;
+}
+
+.step2-footer-text {
+  padding: 0 39px;
+  margin-top: 18px;
+  font-size: 13px;
+  line-height: 1.22;
+  color: #747474;
+  font-weight: 400;
+}
+
+.step2-next-wrap {
+  display: flex;
+  align-items: center;
+  margin-top: 90px;
+  padding-left: 66px;
+}
+
+.step2-next-btn {
+  width: 74px;
+  height: 40px;
+  border: none;
+  border-radius: 22px;
+  background: #1f1f1f;
+  color: #ffffff;
+  font-size: 19px;
+  line-height: 1;
+  font-weight: 700;
+  box-shadow:
+    0 7px 16px rgba(0,0,0,0.34),
+    0 2px 4px rgba(255,255,255,0.08) inset;
+}
+
+.step2-next-line {
+  height: 2px;
+  flex: 1;
+  background: #d3d3d3;
+  margin-left: 0;
+}
+
+.hidden {
+  display: none !important;
+}
 </style>
 </head>
 
@@ -277,44 +444,74 @@ button, input, textarea, select, a {
     </div>
   </div>
 
-  <div id="page2" class="hidden min-h-[100dvh] bg-[#f6f6f6]">
-    <div class="flex flex-col min-h-[100dvh] bg-[#f6f6f6] pt-[16px] pb-[24px]">
+  <!-- UPDATED PAGE 2 -->
+  <div id="page2" class="hidden step2-screen">
+    <div class="step2-progress-wrap px-[31px]">
+      <div class="step2-progress-nav">
+        <div class="step2-progress-active-line"></div>
 
-      <!-- progress -->
-      <div class="px-8 mb-6">
-        <div class="progress-nav">
-
-          <div class="progress-active-line"></div>
-
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check"></div>
-            </div>
-            <div class="text-black text-xs mt-2 font-medium">Выбор</div>
+        <div class="flex flex-col items-center">
+          <div class="step2-circle done">
+            <div class="progress-check"></div>
           </div>
+          <div class="step2-label">Выбор</div>
+        </div>
 
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
-            </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
+        <div class="flex flex-col items-center">
+          <div class="step2-circle active">
+            <div class="progress-check"></div>
           </div>
+          <div class="step2-label active">Данные</div>
+        </div>
 
-          <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
-            </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
+        <div class="flex flex-col items-center">
+          <div class="step2-circle inactive">
+            <div class="progress-check"></div>
           </div>
-
+          <div class="step2-label">Оплата</div>
         </div>
       </div>
+    </div>
 
-      <div class="flex-1 flex flex-col items-center justify-center px-[30px] text-center">
-        <div class="text-[32px] font-semibold text-black mb-4">станица 2</div>
-        <div id="page2Email" class="text-[20px] text-[#181818] break-all"></div>
+    <div class="step2-title">
+      Убедитесь, что введенна<br>правильная информация
+    </div>
+
+    <div class="step2-card">
+      <div class="step2-row">
+        <div class="step2-row-label">Товар:</div>
+        <div id="page2Product" class="step2-row-value">Доступ в закрытый канал “Время бояться”</div>
       </div>
 
+      <div class="step2-divider"></div>
+
+      <div class="step2-row">
+        <div class="step2-row-label">Способ оплаты</div>
+        <div id="page2Bank" class="step2-row-value">Российский банк</div>
+      </div>
+
+      <div class="step2-divider"></div>
+
+      <div class="step2-row">
+        <div class="step2-row-label">Ваш E-mail</div>
+        <div id="page2Email" class="step2-row-value">-введенный имел на пред этапе-</div>
+      </div>
+
+      <div class="step2-divider"></div>
+
+      <div class="step2-row">
+        <div class="step2-row-label">Стоимость</div>
+        <div class="step2-row-value">1200 р</div>
+      </div>
+    </div>
+
+    <div class="step2-footer-text">
+      Проверьте данные и нажмите “далее”<br>для перехода к оплате.
+    </div>
+
+    <div class="step2-next-wrap">
+      <button id="page2NextBtn" type="button" class="step2-next-btn">далее</button>
+      <div class="step2-next-line"></div>
     </div>
   </div>
 </div>
@@ -338,6 +535,9 @@ button, input, textarea, select, a {
   const emailWrap = document.getElementById("emailWrap");
   const emailInput = document.getElementById("email");
   const page2Email = document.getElementById("page2Email");
+  const page2Bank = document.getElementById("page2Bank");
+  const page2Product = document.getElementById("page2Product");
+  const page2NextBtn = document.getElementById("page2NextBtn");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -358,6 +558,34 @@ button, input, textarea, select, a {
     } catch (_) {}
   }
 
+  function getBankLabel(bank) {
+    return bank === "foreign" ? "Зарубежный банк" : "Российский банк";
+  }
+
+  function buildPayload() {
+    const emailValue = emailInput.value.trim();
+
+    return {
+      email: emailValue,
+      bank: selectedBank,
+      bankLabel: getBankLabel(selectedBank),
+      product: "Доступ в закрытый канал “Время бояться”",
+      price: "1200 р"
+    };
+  }
+
+  function renderStep2(payload) {
+    page2Product.textContent = payload.product;
+    page2Bank.textContent = payload.bankLabel;
+    page2Email.textContent = payload.email || "-введенный имел на пред этапе-";
+  }
+
+  function openStep2() {
+    page1.classList.add("hidden");
+    page2.classList.remove("hidden");
+    app.scrollTo({ top: 0, behavior: "auto" });
+  }
+
   function nextStep() {
     const emailValue = emailInput.value.trim();
 
@@ -366,15 +594,14 @@ button, input, textarea, select, a {
       return;
     }
 
-    const payload = {
-      email: emailValue,
-      bank: selectedBank
-    };
+    const payload = buildPayload();
 
-    page2Email.textContent = emailValue;
+    renderStep2(payload);
+    openStep2();
+  }
 
-    page1.classList.add("hidden");
-    page2.classList.remove("hidden");
+  function continueToPayment() {
+    const payload = buildPayload();
 
     if (tg && typeof tg.sendData === "function") {
       try {
@@ -565,6 +792,13 @@ button, input, textarea, select, a {
     e.stopPropagation();
     sendHaptic();
     nextStep();
+  }, { passive: false });
+
+  page2NextBtn.addEventListener("click", function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    sendHaptic();
+    continueToPayment();
   }, { passive: false });
 
   emailInput.addEventListener("focus", handleFocus);
