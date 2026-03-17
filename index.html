@@ -280,15 +280,14 @@ button, input, textarea, select, a {
 (function () {
   "use strict";
 
+  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
   let selectedBank = "russian";
   let lastTouchEnd = 0;
-  let focusTimer = null;
-  let blurTimer = null;
-  let viewportRaf = null;
-  let trackingRaf = null;
-  let trackingUntil = 0;
+  let rafId = 0;
+  let keyboardTrackTimer = 0;
+  let isTrackingKeyboard = false;
 
-  const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   const app = document.getElementById("app");
   const content = document.getElementById("content");
   const emailWrap = document.getElementById("emailWrap");
@@ -297,27 +296,36 @@ button, input, textarea, select, a {
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
 
-  function isKeyboardOpen() {
-    return document.activeElement === emailInput;
+  const LAYOUT = {
+    basePaddingBottom: 24,
+    maxLift: 20,
+    safeTop: 12,
+    safeBottomGap: 18,
+    scrollExtra: 14,
+    keyboardThreshold: 80
+  };
+
+  function sendHaptic() {
+    if (!tg || !tg.HapticFeedback || typeof tg.HapticFeedback.impactOccurred !== "function") return;
+    try {
+      tg.HapticFeedback.impactOccurred("medium");
+    } catch (_) {}
   }
 
-  function getKeyboardInset() {
-    if (!window.visualViewport) return 0;
+  function nextStep() {
+    const payload = {
+      email: emailInput.value.trim(),
+      bank: selectedBank
+    };
 
-    const vv = window.visualViewport;
-    const inset = Math.round(window.innerHeight - vv.height - vv.offsetTop);
+    if (tg && typeof tg.sendData === "function") {
+      try {
+        tg.sendData(JSON.stringify(payload));
+        return;
+      } catch (_) {}
+    }
 
-    return inset > 80 ? inset : 0;
-  }
-
-  function applyKeyboardLayout() {
-    const keyboardInset = getKeyboardInset();
-    const opened = isKeyboardOpen() || keyboardInset > 0;
-
-    content.style.paddingBottom = (24 + keyboardInset) + "px";
-
-    const lift = opened ? Math.min(20, Math.round(keyboardInset * 0.06)) : 0;
-    emailWrap.style.transform = "translateY(-" + lift + "px)";
+    console.log(payload);
   }
 
   function updateBankButtons() {
@@ -336,126 +344,136 @@ button, input, textarea, select, a {
   function selectBank(bank) {
     if (bank !== "russian" && bank !== "foreign") return;
     if (selectedBank === bank) return;
+
     selectedBank = bank;
     updateBankButtons();
   }
 
-  function sendHaptic() {
-    if (!tg || !tg.HapticFeedback || typeof tg.HapticFeedback.impactOccurred !== "function") return;
-    try {
-      tg.HapticFeedback.impactOccurred("medium");
-    } catch (e) {}
+  function isKeyboardOpen() {
+    return document.activeElement === emailInput;
   }
 
-  function nextStep() {
-    const payload = {
-      email: emailInput.value.trim(),
-      bank: selectedBank
-    };
+  function getInnerViewportHeight() {
+    return Math.round(window.innerHeight || document.documentElement.clientHeight || 0);
+  }
 
-    if (tg && typeof tg.sendData === "function") {
-      try {
-        tg.sendData(JSON.stringify(payload));
-      } catch (e) {
-        console.log(payload);
-      }
-    } else {
-      console.log(payload);
-    }
+  function getVisualViewportHeight() {
+    if (!window.visualViewport) return getInnerViewportHeight();
+    return Math.round(window.visualViewport.height || getInnerViewportHeight());
+  }
+
+  function getKeyboardInset() {
+    if (!window.visualViewport) return 0;
+
+    const vv = window.visualViewport;
+    const inset = Math.round(getInnerViewportHeight() - vv.height - vv.offsetTop);
+
+    return inset > LAYOUT.keyboardThreshold ? inset : 0;
+  }
+
+  function applyKeyboardLayout() {
+    const keyboardInset = getKeyboardInset();
+    const opened = isKeyboardOpen() || keyboardInset > 0;
+
+    content.style.paddingBottom = (LAYOUT.basePaddingBottom + keyboardInset) + "px";
+
+    const lift = opened
+      ? Math.min(LAYOUT.maxLift, Math.round(keyboardInset * 0.06))
+      : 0;
+
+    emailWrap.style.transform = "translateY(-" + lift + "px)";
+  }
+
+  function resetKeyboardLayout() {
+    content.style.paddingBottom = LAYOUT.basePaddingBottom + "px";
+    emailWrap.style.transform = "translateY(0)";
   }
 
   function ensureInputVisible(behavior) {
-    const vvHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
     const rect = emailWrap.getBoundingClientRect();
-    const safeTop = 12;
-    const safeBottom = vvHeight - 18;
+    const viewportHeight = getVisualViewportHeight();
+    const safeBottom = viewportHeight - LAYOUT.safeBottomGap;
 
     if (rect.bottom > safeBottom) {
       app.scrollTo({
-        top: app.scrollTop + (rect.bottom - safeBottom) + 14,
-        behavior: behavior || "smooth"
+        top: app.scrollTop + (rect.bottom - safeBottom) + LAYOUT.scrollExtra,
+        behavior: behavior || "auto"
       });
       return;
     }
 
-    if (rect.top < safeTop) {
+    if (rect.top < LAYOUT.safeTop) {
       app.scrollTo({
-        top: Math.max(0, app.scrollTop - (safeTop - rect.top) - 10),
-        behavior: behavior || "smooth"
+        top: Math.max(0, app.scrollTop - (LAYOUT.safeTop - rect.top) - 10),
+        behavior: behavior || "auto"
       });
     }
   }
 
-  function runKeyboardTracking() {
-    if (trackingRaf) cancelAnimationFrame(trackingRaf);
+  function scheduleFrame(fn) {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(fn);
+  }
 
-    const step = function () {
+  function syncLayout() {
+    scheduleFrame(function () {
       applyKeyboardLayout();
 
       if (isKeyboardOpen()) {
         ensureInputVisible("auto");
       } else if (getKeyboardInset() === 0) {
-        content.style.paddingBottom = "24px";
-        emailWrap.style.transform = "translateY(0)";
+        resetKeyboardLayout();
       }
-
-      if (Date.now() < trackingUntil) {
-        trackingRaf = requestAnimationFrame(step);
-      }
-    };
-
-    trackingRaf = requestAnimationFrame(step);
+    });
   }
 
   function startKeyboardTracking(duration) {
-    trackingUntil = Date.now() + duration;
-    runKeyboardTracking();
-  }
+    clearTimeout(keyboardTrackTimer);
+    isTrackingKeyboard = true;
 
-  function scheduleEnsureVisible() {
-    clearTimeout(focusTimer);
-    focusTimer = setTimeout(function () {
-      applyKeyboardLayout();
-      ensureInputVisible("auto");
-      setTimeout(() => ensureInputVisible("auto"), 80);
-      setTimeout(() => ensureInputVisible("auto"), 160);
-      setTimeout(() => ensureInputVisible("auto"), 260);
-    }, 10);
-  }
+    const startedAt = performance.now();
 
-  function handleFocus() {
-    clearTimeout(blurTimer);
-    applyKeyboardLayout();
-    startKeyboardTracking(900);
-    scheduleEnsureVisible();
-  }
-
-  function handleBlur() {
-    clearTimeout(blurTimer);
-    blurTimer = setTimeout(function () {
-      startKeyboardTracking(700);
-      applyKeyboardLayout();
-
-      if (getKeyboardInset() === 0) {
-        content.style.paddingBottom = "24px";
-        emailWrap.style.transform = "translateY(0)";
-      }
-    }, 10);
-  }
-
-  function syncViewportSmooth() {
-    if (viewportRaf) cancelAnimationFrame(viewportRaf);
-
-    viewportRaf = requestAnimationFrame(function () {
+    function tick(now) {
       applyKeyboardLayout();
 
       if (isKeyboardOpen()) {
         ensureInputVisible("auto");
       } else if (getKeyboardInset() === 0) {
-        content.style.paddingBottom = "24px";
-        emailWrap.style.transform = "translateY(0)";
+        resetKeyboardLayout();
       }
-    });
+
+      if (!isTrackingKeyboard) return;
+
+      if (now - startedAt < duration) {
+        rafId = requestAnimationFrame(tick);
+      }
+    }
+
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+
+    keyboardTrackTimer = setTimeout(function () {
+      isTrackingKeyboard = false;
+    }, duration + 40);
+  }
+
+  function handleFocus() {
+    startKeyboardTracking(900);
+
+    setTimeout(() => ensureInputVisible("auto"), 30);
+    setTimeout(() => ensureInputVisible("auto"), 100);
+    setTimeout(() => ensureInputVisible("auto"), 180);
+    setTimeout(() => ensureInputVisible("auto"), 280);
+  }
+
+  function handleBlur() {
+    startKeyboardTracking(700);
+
+    setTimeout(function () {
+      if (!isKeyboardOpen() && getKeyboardInset() === 0) {
+        resetKeyboardLayout();
+      }
+    }, 120);
   }
 
   function isInteractiveElement(target) {
@@ -463,9 +481,7 @@ button, input, textarea, select, a {
   }
 
   function handleOutsidePointer(event) {
-    if (isInteractiveElement(event.target)) {
-      return;
-    }
+    if (isInteractiveElement(event.target)) return;
 
     if (document.activeElement === emailInput) {
       emailInput.blur();
@@ -522,38 +538,29 @@ button, input, textarea, select, a {
   });
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", syncViewportSmooth);
-    window.visualViewport.addEventListener("scroll", syncViewportSmooth);
+    window.visualViewport.addEventListener("resize", syncLayout);
+    window.visualViewport.addEventListener("scroll", syncLayout);
   }
 
+  window.addEventListener("resize", syncLayout);
+
   window.addEventListener("orientationchange", function () {
-    setTimeout(function () {
-      applyKeyboardLayout();
-      if (isKeyboardOpen()) {
-        ensureInputVisible("auto");
-      }
-    }, 250);
+    setTimeout(syncLayout, 250);
   });
-
-  window.addEventListener("resize", function () {
-    applyKeyboardLayout();
-    if (isKeyboardOpen()) {
-      ensureInputVisible("auto");
-    }
-  });
-
-  applyKeyboardLayout();
-  updateBankButtons();
 
   if (tg) {
     try {
       tg.ready();
       tg.expand();
+
       if (typeof tg.disableVerticalSwipes === "function") {
         tg.disableVerticalSwipes();
       }
-    } catch (e) {}
+    } catch (_) {}
   }
+
+  resetKeyboardLayout();
+  updateBankButtons();
 })();
 </script>
 
