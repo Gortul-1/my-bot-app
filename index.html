@@ -43,12 +43,12 @@ body {
 #content {
   min-height: 100%;
   padding-bottom: 24px;
-  transition: padding-bottom 0.28s ease;
   background: #f6f6f6;
+  will-change: padding-bottom;
 }
 
 #emailWrap {
-  transition: transform 0.28s ease;
+  will-change: transform;
 }
 
 * {
@@ -285,7 +285,8 @@ button, input, textarea, select, a {
   let focusTimer = null;
   let blurTimer = null;
   let viewportRaf = null;
-  let delayedFocusTimer = null;
+  let trackingRaf = null;
+  let trackingUntil = 0;
 
   const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
   const app = document.getElementById("app");
@@ -314,7 +315,9 @@ button, input, textarea, select, a {
     const opened = isKeyboardOpen() || keyboardInset > 0;
 
     content.style.paddingBottom = (24 + keyboardInset) + "px";
-    emailWrap.style.transform = opened ? "translateY(-8px)" : "translateY(0)";
+
+    const lift = opened ? Math.min(20, Math.round(keyboardInset * 0.06)) : 0;
+    emailWrap.style.transform = "translateY(-" + lift + "px)";
   }
 
   function updateBankButtons() {
@@ -383,37 +386,61 @@ button, input, textarea, select, a {
     }
   }
 
+  function runKeyboardTracking() {
+    if (trackingRaf) cancelAnimationFrame(trackingRaf);
+
+    const step = function () {
+      applyKeyboardLayout();
+
+      if (isKeyboardOpen()) {
+        ensureInputVisible("auto");
+      } else if (getKeyboardInset() === 0) {
+        content.style.paddingBottom = "24px";
+        emailWrap.style.transform = "translateY(0)";
+      }
+
+      if (Date.now() < trackingUntil) {
+        trackingRaf = requestAnimationFrame(step);
+      }
+    };
+
+    trackingRaf = requestAnimationFrame(step);
+  }
+
+  function startKeyboardTracking(duration) {
+    trackingUntil = Date.now() + duration;
+    runKeyboardTracking();
+  }
+
   function scheduleEnsureVisible() {
     clearTimeout(focusTimer);
     focusTimer = setTimeout(function () {
       applyKeyboardLayout();
-      ensureInputVisible("smooth");
-      setTimeout(() => ensureInputVisible("smooth"), 120);
-      setTimeout(() => ensureInputVisible("smooth"), 240);
-      setTimeout(() => ensureInputVisible("smooth"), 380);
-    }, 40);
-  }
-
-  function scheduleDelayedFocus() {
-    clearTimeout(delayedFocusTimer);
-    delayedFocusTimer = setTimeout(function () {
-      emailInput.focus();
-    }, 1000);
+      ensureInputVisible("auto");
+      setTimeout(() => ensureInputVisible("auto"), 80);
+      setTimeout(() => ensureInputVisible("auto"), 160);
+      setTimeout(() => ensureInputVisible("auto"), 260);
+    }, 10);
   }
 
   function handleFocus() {
     clearTimeout(blurTimer);
     applyKeyboardLayout();
+    startKeyboardTracking(900);
     scheduleEnsureVisible();
   }
 
   function handleBlur() {
     clearTimeout(blurTimer);
     blurTimer = setTimeout(function () {
+      startKeyboardTracking(700);
       applyKeyboardLayout();
-      emailWrap.style.transform = "translateY(0)";
-      content.style.paddingBottom = "24px";
-    }, 120);
+
+      if (getKeyboardInset() === 0) {
+        content.style.paddingBottom = "24px";
+        emailWrap.style.transform = "translateY(0)";
+      }
+    }, 10);
   }
 
   function syncViewportSmooth() {
@@ -439,8 +466,6 @@ button, input, textarea, select, a {
     if (isInteractiveElement(event.target)) {
       return;
     }
-
-    clearTimeout(delayedFocusTimer);
 
     if (document.activeElement === emailInput) {
       emailInput.blur();
@@ -472,20 +497,12 @@ button, input, textarea, select, a {
   emailInput.addEventListener("blur", handleBlur);
 
   emailInput.addEventListener("click", function (e) {
-    e.preventDefault();
     e.stopPropagation();
-    if (!isKeyboardOpen()) {
-      scheduleDelayedFocus();
-    }
-  }, { passive: false });
+  });
 
   emailInput.addEventListener("touchstart", function (e) {
-    e.preventDefault();
     e.stopPropagation();
-    if (!isKeyboardOpen()) {
-      scheduleDelayedFocus();
-    }
-  }, { passive: false });
+  }, { passive: true });
 
   document.addEventListener("click", handleOutsidePointer, { passive: true });
   document.addEventListener("touchstart", handleOutsidePointer, { passive: true });
