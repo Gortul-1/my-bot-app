@@ -55,7 +55,12 @@ body {
   box-sizing: border-box;
 }
 
-/* progress bar */
+button, input, textarea, select, a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* unified progress bar */
 
 .progress-nav {
   position: relative;
@@ -95,8 +100,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: white;
-  box-shadow: 0 3px 5px rgba(0,0,0,0.15), inset 0 1px 2px rgba(0,0,0,0.12);
+  background: #ffffff;
+  box-shadow:
+    0 3px 5px rgba(0,0,0,0.15),
+    inset 0 1px 2px rgba(0,0,0,0.12);
   flex-shrink: 0;
   position: relative;
   z-index: 2;
@@ -111,7 +118,32 @@ body {
   margin-top: -2px;
 }
 
-/* кнопка не выбрана */
+.progress-label {
+  font-size: 12px;
+  line-height: 1;
+  margin-top: 10px;
+  font-weight: 500;
+  color: #b5b5b5;
+}
+
+.progress-label.active {
+  color: #232323;
+}
+
+.progress-circle.done .progress-check,
+.progress-circle.active .progress-check {
+  opacity: 1;
+}
+
+.progress-circle.inactive {
+  opacity: 0.56;
+}
+
+.progress-circle.inactive .progress-check {
+  opacity: 0.22;
+}
+
+/* page 1 controls */
 
 .neu-button {
   border-radius: 49px;
@@ -119,11 +151,8 @@ body {
   box-shadow: inset 2px 2px 4px rgba(0,0,0,0.12);
   transition: all 0.25s ease;
   color: #9c9c9c;
-  -webkit-tap-highlight-color: transparent;
   border: none;
 }
-
-/* кнопка выбрана */
 
 .neu-active {
   border-radius: 49px;
@@ -133,7 +162,6 @@ body {
     0px 25px 60px rgba(0,0,0,0.20);
   transition: all 0.25s ease;
   color: #000;
-  -webkit-tap-highlight-color: transparent;
   border: none;
 }
 
@@ -145,94 +173,20 @@ body {
 .input-style {
   border-radius: 54px;
   background: #fff;
-  box-shadow: inset 0px 4.9px 4.9px rgba(0,0,0,0.22), 0px 4.9px 4.9px rgba(0,0,0,0.10);
+  box-shadow:
+    inset 0px 4.9px 4.9px rgba(0,0,0,0.22),
+    0px 4.9px 4.9px rgba(0,0,0,0.10);
   font-size: 16px;
   outline: none;
   border: none;
 }
 
-button, input, textarea, select, a {
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
-}
-
-/* STEP 2 exact-like UI */
-.step2-progress-nav {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%;
-  max-width: 250px;
-  margin: 0 auto;
-}
-
-.step2-progress-nav::before {
-  content: '';
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  right: 14px;
-  height: 2px;
-  background: #d8d8d8;
-  z-index: 1;
-}
-
-.step2-progress-active-line {
-  position: absolute;
-  top: 14px;
-  left: 14px;
-  width: calc(50% - 14px);
-  height: 2px;
-  background: #bbbbbb;
-  z-index: 1;
-}
-
-.step2-circle {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow:
-    0 2px 5px rgba(0,0,0,0.12),
-    inset 0 1px 2px rgba(0,0,0,0.10);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
-
-.step2-circle.inactive {
-  opacity: 0.56;
-}
-
-.step2-circle.active .progress-check,
-.step2-circle.done .progress-check {
-  opacity: 1;
-}
-
-.step2-circle.inactive .progress-check {
-  opacity: 0.22;
-}
-
-.step2-label {
-  margin-top: 10px;
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 500;
-  color: #b5b5b5;
-}
-
-.step2-label.active {
-  color: #232323;
-}
+/* step 2 */
 
 .step2-screen {
   min-height: 100dvh;
   background: #f6f6f6;
-  padding: 15px 0 24px;
+  padding: 16px 0 24px;
 }
 
 .step2-title {
@@ -261,7 +215,7 @@ button, input, textarea, select, a {
 
 .step2-divider {
   height: 1px;
-  margin: 0 0 0 17px;
+  margin-left: 17px;
   background: #d9d9d9;
 }
 
@@ -316,7 +270,6 @@ button, input, textarea, select, a {
   height: 2px;
   flex: 1;
   background: #d3d3d3;
-  margin-left: 0;
 }
 
 .hidden {
@@ -334,36 +287,33 @@ button, input, textarea, select, a {
       <!-- progress -->
       <div class="px-8 mb-6">
         <div class="progress-nav">
-
           <div class="progress-active-line"></div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle">
+            <div class="progress-circle done">
               <div class="progress-check"></div>
             </div>
-            <div class="text-black text-xs mt-2 font-medium">Выбор</div>
+            <div class="progress-label active">Выбор</div>
           </div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
+            <div class="progress-circle active">
+              <div class="progress-check"></div>
             </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Данные</div>
+            <div class="progress-label">Данные</div>
           </div>
 
           <div class="flex flex-col items-center">
-            <div class="progress-circle">
-              <div class="progress-check opacity-30"></div>
+            <div class="progress-circle inactive">
+              <div class="progress-check"></div>
             </div>
-            <div class="text-gray-400 text-xs mt-2 font-medium">Оплата</div>
+            <div class="progress-label">Оплата</div>
           </div>
-
         </div>
       </div>
 
       <!-- товар -->
       <div class="flex flex-col px-[30px]">
-
         <div class="text-[#646464] text-base opacity-80 mb-2">
           Товар:
         </div>
@@ -382,18 +332,15 @@ button, input, textarea, select, a {
             </div>
           </div>
         </div>
-
       </div>
 
       <!-- кнопки -->
       <div class="px-[30px] mt-6">
-
         <div class="text-[#646464] text-base opacity-80 mb-4">
           Способ оплаты
         </div>
 
         <div class="flex gap-[22px]">
-
           <button id="russian" type="button" class="w-[155px] h-[84px] neu-active flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
             Российский<br>банк
           </button>
@@ -401,25 +348,20 @@ button, input, textarea, select, a {
           <button id="foreign" type="button" class="w-[155px] h-[84px] neu-button flex items-center justify-center text-sm font-medium text-center leading-[1.2]">
             Зарубежный<br>банк
           </button>
-
         </div>
-
       </div>
 
       <!-- email -->
       <div class="px-[30px] mt-6" id="emailWrap">
-
         <div class="text-[#646464] text-base opacity-80 mb-3">
           Ваш E-mail для отправки чека
         </div>
 
         <input id="email" type="email" inputmode="email" autocomplete="email" class="w-full h-[30px] px-4 input-style"/>
-
       </div>
 
       <!-- цена -->
       <div class="px-[30px] mt-6">
-
         <div class="text-[#646464] text-[18px]">
           к оплате
         </div>
@@ -427,48 +369,44 @@ button, input, textarea, select, a {
         <div class="text-[30px] font-bold text-[#181818]">
           1200 р
         </div>
-
       </div>
 
       <!-- кнопка далее -->
       <div class="flex items-center px-[30px] mt-6">
-
         <button id="nextBtn" type="button" class="w-[150px] h-[58px] flex items-center justify-center text-center bg-[#1f1f1f] text-white text-[26px] rounded-[40px] shadow-lg leading-none">
           <span class="block w-full text-center">далее</span>
         </button>
 
         <div class="h-[2px] bg-gray-300 flex-grow -mr-[30px]"></div>
-
       </div>
-
     </div>
   </div>
 
-  <!-- UPDATED PAGE 2 -->
   <div id="page2" class="hidden step2-screen">
-    <div class="step2-progress-wrap px-[31px]">
-      <div class="step2-progress-nav">
-        <div class="step2-progress-active-line"></div>
+    <!-- same progress bar as page 1 -->
+    <div class="px-8 mb-6">
+      <div class="progress-nav">
+        <div class="progress-active-line"></div>
 
         <div class="flex flex-col items-center">
-          <div class="step2-circle done">
+          <div class="progress-circle done">
             <div class="progress-check"></div>
           </div>
-          <div class="step2-label">Выбор</div>
+          <div class="progress-label">Выбор</div>
         </div>
 
         <div class="flex flex-col items-center">
-          <div class="step2-circle active">
+          <div class="progress-circle active">
             <div class="progress-check"></div>
           </div>
-          <div class="step2-label active">Данные</div>
+          <div class="progress-label active">Данные</div>
         </div>
 
         <div class="flex flex-col items-center">
-          <div class="step2-circle inactive">
+          <div class="progress-circle inactive">
             <div class="progress-check"></div>
           </div>
-          <div class="step2-label">Оплата</div>
+          <div class="progress-label">Оплата</div>
         </div>
       </div>
     </div>
@@ -595,7 +533,6 @@ button, input, textarea, select, a {
     }
 
     const payload = buildPayload();
-
     renderStep2(payload);
     openStep2();
   }
