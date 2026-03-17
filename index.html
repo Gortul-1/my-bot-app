@@ -310,8 +310,9 @@ button, input, textarea, select, a {
         </div>
       </div>
 
-      <div class="flex-1 flex items-center justify-center">
-        <div class="text-[32px] font-semibold text-black">станица 2</div>
+      <div class="flex-1 flex flex-col items-center justify-center px-[30px] text-center">
+        <div class="text-[32px] font-semibold text-black mb-4">станица 2</div>
+        <div id="page2Email" class="text-[20px] text-[#181818] break-all"></div>
       </div>
 
     </div>
@@ -336,6 +337,7 @@ button, input, textarea, select, a {
   const content = document.getElementById("content");
   const emailWrap = document.getElementById("emailWrap");
   const emailInput = document.getElementById("email");
+  const page2Email = document.getElementById("page2Email");
   const russianBtn = document.getElementById("russian");
   const foreignBtn = document.getElementById("foreign");
   const nextBtn = document.getElementById("nextBtn");
@@ -357,10 +359,19 @@ button, input, textarea, select, a {
   }
 
   function nextStep() {
+    const emailValue = emailInput.value.trim();
+
+    if (!emailValue) {
+      emailInput.focus();
+      return;
+    }
+
     const payload = {
-      email: emailInput.value.trim(),
+      email: emailValue,
       bank: selectedBank
     };
+
+    page2Email.textContent = emailValue;
 
     page1.classList.add("hidden");
     page2.classList.remove("hidden");
